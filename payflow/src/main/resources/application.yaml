@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: payflow
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payflow
+    username: postgres
+    password: bah12
+  docker:
+    compose:
+      enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: create
+server:
+  port: 5000

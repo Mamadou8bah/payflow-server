@@ -1,9 +1,6 @@
 package com.mamadou.payflow.auth.service;
 
-import com.mamadou.payflow.auth.dto.RegisterRequest;
-import com.mamadou.payflow.auth.dto.RegisterRequestStage2;
-import com.mamadou.payflow.auth.dto.RegisterRequestStage3;
-import com.mamadou.payflow.auth.dto.RegisterResponse;
+import com.mamadou.payflow.auth.dto.*;
 import com.mamadou.payflow.common.Exception.AccountNotFoundException;
 import com.mamadou.payflow.common.Exception.InvalidPasswordException;
 import com.mamadou.payflow.user.entity.User;
@@ -64,6 +61,11 @@ public class AuthService {
     @Transactional
     public RegisterResponse registerMerchant(RegisterRequest registerRequest) {
         return new RegisterResponse();
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public LoginResponse merchantLogin(LoginRequest request){
+        return new LoginResponse();
     }
 
 

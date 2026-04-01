@@ -5,11 +5,10 @@ import com.mamadou.payflow.common.Exception.AccountNotFoundException;
 import com.mamadou.payflow.common.Exception.InvalidPasswordException;
 import com.mamadou.payflow.user.entity.User;
 import com.mamadou.payflow.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
@@ -63,10 +62,15 @@ public class AuthService {
         return new RegisterResponse();
     }
 
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public LoginResponse merchantLogin(LoginRequest request){
         return new LoginResponse();
     }
+
+    public String verifyEmail(){
+        return null;
+    }
+
 
 
 }

@@ -2,7 +2,7 @@
 
 A comprehensive, high-performance payment processing platform built with Spring Boot 4.0.4, designed to handle complex financial transactions, wallet management, risk assessment, and reconciliation at scale.
 
-## 📋 Table of Contents
+## [CONTENTS] Table of Contents
 
 - [Overview](#overview)
 - [Features](#features)
@@ -24,21 +24,21 @@ A comprehensive, high-performance payment processing platform built with Spring 
 
 Payflow is an enterprise-grade payment processing platform that provides:
 
-- **Secure Authentication & Authorization**: JWT-based auth with API key support and refresh tokens
-- **Wallet Management**: Multi-currency wallet support with KYC levels and transaction limits
-- **Risk Assessment**: Real-time transaction risk evaluation with configurable rules
-- **Financial Ledger**: Double-entry accounting system for all financial transactions
-- **Reconciliation Engine**: Automated wallet-to-ledger consistency checking
-- **Transfer Management**: Atomic transfer execution with ledger recording
-- **Webhook Integration**: Event-driven architecture with ModemPay webhook support
-- **Notifications**: Multi-channel notifications (SMS, Email) with provider abstraction
-- **Audit Trail**: Comprehensive audit logging for compliance and debugging
-- **Admin Dashboard**: Administrative controls and user management
-- **Metrics & Monitoring**: Prometheus metrics and health checks for production monitoring
+- **[AUTH] Secure Authentication & Authorization**: JWT-based auth with API key support and refresh tokens
+- **[WALLET] Wallet Management**: Multi-currency wallet support with KYC levels and transaction limits
+- **[RISK] Risk Assessment**: Real-time transaction risk evaluation with configurable rules
+- **[LEDGER] Financial Ledger**: Double-entry accounting system for all financial transactions
+- **[RECONCILE] Reconciliation Engine**: Automated wallet-to-ledger consistency checking
+- **[TRANSFER] Transfer Management**: Atomic transfer execution with ledger recording
+- **[WEBHOOK] Webhook Integration**: Event-driven architecture with ModemPay webhook support
+- **[NOTIFY] Notifications**: Multi-channel notifications (SMS, Email) with provider abstraction
+- **[AUDIT] Audit Trail**: Comprehensive audit logging for compliance and debugging
+- **[ADMIN] Admin Dashboard**: Administrative controls and user management
+- **[METRICS] Metrics & Monitoring**: Prometheus metrics and health checks for production monitoring
 
 ## Features
 
-### 🔐 Security
+### [SECURITY] Security
 - JWT-based authentication with configurable expiration
 - API Key management for service-to-service communication
 - Refresh token mechanism for improved security
@@ -46,7 +46,7 @@ Payflow is an enterprise-grade payment processing platform that provides:
 - Request validation and sanitization
 - Global exception handling with security considerations
 
-### 💰 Wallet Management
+### [WALLET] Wallet Management
 - Create and manage user wallets
 - Real-time balance tracking
 - KYC level verification (Level 0-5)
@@ -54,48 +54,48 @@ Payflow is an enterprise-grade payment processing platform that provides:
 - Wallet status management (ACTIVE, SUSPENDED, CLOSED)
 - Wallet transaction history
 
-### ⚖️ Financial Ledger
+### [LEDGER] Financial Ledger
 - Double-entry accounting system
 - Transaction categorization and tagging
 - Debit/credit management
 - Ledger posting with balance tracking
 - Transaction reconciliation support
 
-### 📊 Risk Assessment
+### [ANALYTICS] Risk Assessment
 - Real-time transaction risk scoring
 - Configurable risk rules (CRITICAL, HIGH, MEDIUM, LOW)
 - Parallel rule evaluation for performance
 - Rule-based blocking and approval workflows
 - Risk metrics and dashboard
 
-### 🔄 Transfer Management
+### [TRANSFER] Transfer Management
 - Atomic transfer operations
 - Concurrent transfer execution
 - Ledger integration for financial tracking
 - Transfer status management
 - Batch transfer processing
 
-### 🔗 Webhook Management
+### [WEBHOOK] Webhook Management
 - Event-driven architecture
 - ModemPay webhook integration
 - Signature validation (HMAC)
 - Reliable event delivery
 - Event retry mechanisms
 
-### 📬 Notifications
+### [NOTIFICATIONS] Notifications
 - SMS notifications (Twilio integration)
 - Email notifications
 - Provider abstraction for easy switching
 - Template-based message formatting
 - Async notification processing
 
-### 📋 Audit & Compliance
+### [AUDIT] Audit & Compliance
 - Automatic entity auditing (CreatedBy, ModifiedBy, timestamps)
 - Audit log tracking
 - Correlation ID tracking for request tracing
 - Comprehensive logging
 
-### 📈 Admin & Monitoring
+### [ADMIN] Admin & Monitoring
 - Admin user management
 - Health checks
 - Prometheus metrics
@@ -107,13 +107,13 @@ Payflow is an enterprise-grade payment processing platform that provides:
 | Component | Technology | Version |
 |-----------|-----------|---------|
 | Framework | Spring Boot | 4.0.4 |
-| Java | OpenJDK | 17+ |
+| Language | Java (OpenJDK) | 17+ |
 | Database | PostgreSQL | 15+ |
 | Cache | Redis | 7.0+ |
-| ORM | Hibernate | 6.2+ |
+| ORM/Persistence | Hibernate JPA | 6.2+ |
 | Build Tool | Maven | 3.8+ |
-| Auth | Spring Security | 6.2+ |
-| JSON | Jackson | 2.15+ |
+| Authentication | Spring Security | 6.2+ |
+| JSON Processing | Jackson | 2.15+ |
 | Validation | Jakarta Bean Validation | 3.0+ |
 
 ### Additional Libraries
@@ -255,14 +255,14 @@ payflow/
 
 ## Installation & Setup
 
-### 1. Clone the Repository
+### Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/Mamadou8bah/payflow-server.git
 cd payflow-server
 ```
 
-### 2. Set Up Local Database
+### Step 2: Set Up Local Database
 
 #### Using Docker Compose (Recommended)
 ```bash
@@ -283,7 +283,7 @@ psql -U postgres
 CREATE DATABASE payflow;
 ```
 
-### 3. Configure Environment Variables
+### Step 3: Configure Environment Variables
 
 Create a `.env` file in the project root:
 
@@ -325,7 +325,7 @@ PAYFLOW_RISK_MEDIUM_THRESHOLD=5.0
 PAYFLOW_SMS_PROVIDER=noop  # or 'twilio' for production
 ```
 
-### 4. Build the Project
+### Step 4: Build the Project
 
 ```bash
 # Using Maven wrapper
@@ -375,7 +375,7 @@ Key configuration sections:
 
 ## Running the Application
 
-### 1. Start PostgreSQL and Redis
+### Step 1: Start PostgreSQL and Redis
 
 ```bash
 # Using Docker Compose
@@ -386,7 +386,7 @@ docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=bah12 postgres:1
 docker run -d -p 6379:6379 --name redis redis:7
 ```
 
-### 2. Run the Application
+### Step 2: Run the Application
 
 ```bash
 # Using Maven wrapper
@@ -397,7 +397,7 @@ docker run -d -p 6379:6379 --name redis redis:7
 java -jar target/payflow-0.0.1-SNAPSHOT.jar
 ```
 
-### 3. Verify Application is Running
+### Step 3: Verify Application is Running
 
 ```bash
 # Health check
@@ -652,105 +652,301 @@ GET /actuator/info
 
 ## Architecture & Design
 
-### Layered Architecture
+### [ARCHITECTURE] System Architecture Overview
 
-The application follows a clean, layered architecture:
-
-```
-┌─────────────────────────────────────┐
-│       REST Controllers               │  (HTTP endpoints)
-├─────────────────────────────────────┤
-│       Service Layer                  │  (Business logic)
-├─────────────────────────────────────┤
-│       Repository Layer               │  (Data access)
-├─────────────────────────────────────┤
-│       Entity & Domain Models         │  (Data models)
-├─────────────────────────────────────┤
-│       Database (PostgreSQL)          │  (Persistence)
-└─────────────────────────────────────┘
-```
-
-### Design Patterns Used
-
-1. **Service Layer Pattern**: Business logic encapsulated in service classes
-2. **Repository Pattern**: Data access abstraction using Spring Data JPA
-3. **DTO Pattern**: Data transfer objects for API requests/responses
-4. **Mapper Pattern**: Entity-to-DTO conversion with custom mappers
-5. **Factory Pattern**: Creating complex objects (e.g., risk rules)
-6. **Observer Pattern**: Event-driven webhook processing
-7. **Singleton Pattern**: Configuration beans and services
-8. **Async/Await Pattern**: Non-blocking operations with CompletableFuture
-
-### Module Interactions
+Payflow implements a comprehensive, multi-layered architecture optimized for high-throughput payment processing:
 
 ```
-┌────────────────────────────────────────────────────────────┐
-│                   API Controllers                           │
-├────────────────────────────────────────────────────────────┤
-│  Auth │ Wallet │ Transfer │ Transaction │ Risk │ Webhook  │
-├────────────────────────────────────────────────────────────┤
-│                    Service Layer                            │
-├────────────────────────────────────────────────────────────┤
-│ User │ Wallet │ Transfer │ Ledger │ Risk │ Reconciliation │
-├────────────────────────────────────────────────────────────┤
-│                  Repository/Data Layer                      │
-├────────────────────────────────────────────────────────────┤
-│  PostgreSQL Database │ Redis Cache │ External APIs        │
-└────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                  CLIENT LAYER                                    │
+│     Web Apps │ Mobile Apps │ Third-party Services               │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────────┐
+│            API GATEWAY & LOAD BALANCER                           │
+│         (Request Routing, Rate Limiting, Auth)                   │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+       ┌─────────────────┼─────────────────┐
+       │                 │                 │
+  [REST-API]      [AUTH-FILTER]    [WEBHOOK-HANDLER]
+       │                 │                 │
+       └─────────────────┼─────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────────┐
+│              PRESENTATION LAYER                                  │
+│    REST Controllers │ Exception Handlers │ Request Filters      │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────────┐
+│              SERVICE LAYER (Business Logic)                      │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  AuthService  │ WalletService │ RiskEngineService       │  │
+│  │  TransferService │ LedgerService │ ReconciliationService│  │
+│  │  WebhookService  │ NotificationService │ AuditService   │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────────┐
+│              PERSISTENCE LAYER                                   │
+│    JPA Repositories │ Custom Queries │ Data Access Objects      │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+        ┌────────────────┼────────────────┐
+        │                │                │
+  [POSTGRESQL]    [REDIS CACHE]    [ASYNC EXECUTORS]
+   [Database]     [10-min TTL]    [Thread Pools]
+        │                │                │
+        └────────────────┼────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────────┐
+│              DATA & INTEGRATION LAYER                            │
+│  PostgreSQL │ Redis │ Twilio │ Email │ ModemPay │ External APIs│
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+### [LAYERS] Detailed Layered Architecture
+
+```
+        [PRESENTATION LAYER]
+        REST Controllers (HTTP Handlers)
+        - Request validation with @Valid
+        - Response mapping to DTOs
+        - HTTP status codes
+              ↓
+        [SERVICE LAYER]
+        Business Logic & Orchestration
+        - Core application logic
+        - Service-to-service coordination
+        - Async operation management
+        - Transaction handling
+              ↓
+        [REPOSITORY LAYER]
+        Data Access Abstraction
+        - JPA entity management
+        - Custom query execution
+        - Transaction boundaries
+              ↓
+        [ENTITY LAYER]
+        Domain Models & Persistence
+        - JPA annotated entities
+        - Relationship mappings
+        - Validation constraints
+              ↓
+        [DATA STORE LAYER]
+        Actual Storage & Retrieval
+        PostgreSQL │ Redis │ External Services
+```
+
+### [FLOW] Request Processing Flow
+
+```
+User Request (HTTP)
+       │
+       ▼
+    Load Balancer
+       │
+       ├─► Rate Limiting Check
+       │   (Login: 10/60s, Refresh: 20/60s)
+       │
+       ├─► JWT Authentication
+       │   (Validate token, extract claims)
+       │
+       ├─► Authorization Check
+       │   (Verify role/permissions)
+       │
+       ├─► Route to Controller
+       │
+       ▼
+  REST Controller
+       │
+       ├─► @Valid annotation
+       │   (Constraint validation)
+       │
+       ├─► Request DTO Binding
+       │
+       ├─► Call Service Layer
+       │
+       ▼
+   Service Layer
+       │
+       ├─► Business Logic Processing
+       │   (Multiple services may interact)
+       │
+       ├─► Check Cache (Redis)
+       │   (If not found, proceed to DB)
+       │
+       ├─► Repository Call
+       │
+       ▼
+  Repository Layer
+       │
+       ├─► Execute JPA Query
+       │
+       ├─► Database Interaction
+       │   (PostgreSQL)
+       │
+       ├─► Update Cache (Redis)
+       │
+       ▼
+   Return Entity to Service
+       │
+       ├─► Post-processing
+       │
+       ├─► Async Tasks (if any)
+       │   (Notifications, Webhooks)
+       │
+       ├─► Convert to DTO
+       │
+       ▼
+   Return to Controller
+       │
+       ├─► Wrap in ApiResponse
+       │
+       ├─► Set HTTP Headers
+       │
+       ▼
+   HTTP Response
+       │
+       ▼
+    Client
+```
+
+### [MODULES] Core Module Architecture
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                  AUTH MODULE (Security Core)                  │
+│  [JWT Generation] [API Key Management] [Token Refresh]       │
+│  [Role-Based Access] [Security Filters]                      │
+└──────────┬───────────────────────────────────────────────────┘
+           │
+       ┌───┴───┬────────────────────┬──────────────────┐
+       │       │                    │                  │
+    [USER]  [WALLET]          [TRANSFER]         [WALLET-TXN]
+    Module  Module             Module             Module
+       │       │                    │                  │
+       └───┬───┴───┬────────────────┼──────────────┬──┘
+           │       │                │              │
+       [LEDGER]  [RISK]        [RECONCILIATION]  [WEBHOOK]
+       Module    Module          Module          Module
+           │       │                │              │
+           └───┬───┴────────────────┼──────────────┘
+               │                    │
+          [NOTIFICATIONS]     [AUDIT LOGS]
+          Module              Module
+               │                │
+               └────────────────┴─────────────────────┐
+                                                      │
+              [COMMON/SHARED UTILITIES & CONFIG]
+              (AsyncConfig, SecurityConfig, etc.)
+```
+
+### [PATTERNS] Design Patterns Implemented
+
+1. **Service Layer Pattern**
+   - Encapsulates business logic away from controllers
+   - Enables service reusability and testing
+   - Single responsibility per service
+
+2. **Repository Pattern (Data Access Object)**
+   - Abstracts data persistence details
+   - Enables database independence
+   - Supports custom query implementation
+
+3. **DTO Pattern (Data Transfer Object)**
+   - Decouples internal models from API contracts
+   - Enables API versioning
+   - Reduces over-fetching of data
+
+4. **Mapper Pattern**
+   - Centralizes entity-to-DTO conversions
+   - Enables consistent transformations
+   - Supports complex mapping logic
+
+5. **Factory Pattern**
+   - Creates risk rules dynamically
+   - Abstracts object instantiation
+   - Enables flexible rule management
+
+6. **Observer Pattern (Event-Driven)**
+   - Decouples event producers from consumers
+   - Enables webhook processing
+   - Supports async notifications
+
+7. **Async Pattern (CompletableFuture)**
+   - Non-blocking operations
+   - Improved throughput for I/O operations
+   - Concurrent processing with thread pools
+
+8. **Strategy Pattern**
+   - Pluggable notification providers (SMS, Email)
+   - Runtime strategy selection
+   - Easy provider switching
+
+9. **Singleton Pattern**
+   - Configuration beans (AsyncConfig, SecurityConfig)
+   - Managed by Spring IoC container
+   - Single instance across application
+
+10. **Decorator Pattern**
+    - Security filters wrap HTTP requests
+    - Adds functionality without modifying originals
+    - Clean cross-cutting concerns
 
 ## Concurrency & Performance
 
 ### Overview
 Payflow implements sophisticated concurrency patterns for high-throughput payment processing. See [CONCURRENCY_GUIDE.md](payflow/CONCURRENCY_GUIDE.md) for detailed information.
 
-### Async Executors
+### [ASYNC] Async Executors
 
 #### riskEvaluationExecutor
-- **Threads**: 4 core, 8 max
+- **Config**: Core=4, Max=8
 - **Purpose**: Parallel risk rule evaluation
-- **Use Case**: Evaluating multiple risk rules concurrently
+- **Use Case**: Evaluating 10+ risk rules concurrently
 
 #### reconciliationExecutor
-- **Threads**: 8 core, 16 max
+- **Config**: Core=8, Max=16
 - **Purpose**: Batch wallet reconciliation
 - **Use Case**: Parallel wallet-to-ledger consistency checks
 
 #### webhookExecutor
-- **Threads**: 6 core, 12 max
+- **Config**: Core=6, Max=12
 - **Purpose**: Webhook processing
 - **Use Case**: Parallel webhook validation and processing
 
 #### transferExecutor
-- **Threads**: 10 core, 20 max
+- **Config**: Core=10, Max=20
 - **Purpose**: Transfer execution
 - **Use Case**: Parallel ledger recording and wallet updates
 
 #### taskExecutor (Default)
-- **Threads**: 10 core, 20 max
+- **Config**: Core=10, Max=20
 - **Purpose**: General async operations
 - **Use Case**: Notifications, batch jobs, etc.
 
-### Performance Optimizations
+### [OPTIMIZATION] Performance Optimizations
 
-1. **Parallel Rule Evaluation**: Risk rules evaluated concurrently instead of sequentially
-2. **Connection Pooling**: HikariCP for database connection management
-3. **Redis Caching**: 10-minute TTL for frequently accessed data
-4. **Batch Processing**: Bulk operations for reconciliation
-5. **Lazy Loading**: JPA lazy loading for related entities
-6. **Query Optimization**: Custom repository queries to minimize N+1 problems
-7. **Rate Limiting**: Prevent abuse and ensure fair resource usage
+1. **Parallel Rule Evaluation**: Risk rules evaluated concurrently instead of sequentially (10+ sequential queries → parallel execution)
+2. **Connection Pooling**: HikariCP manages database connections efficiently
+3. **Redis Caching**: 10-minute TTL for frequently accessed data reduces database load
+4. **Batch Processing**: Bulk operations for reconciliation minimize round-trips
+5. **Lazy Loading**: JPA lazy loading prevents unnecessary data fetching
+6. **Query Optimization**: Custom repository queries minimize N+1 problem
+7. **Rate Limiting**: Protects against abuse and ensures fair resource usage
 
 ## Development Guidelines
 
-### Code Style
+### [STYLE] Code Style
 - Follow Spring Framework conventions
 - Use meaningful variable and method names
-- Keep methods focused and small (single responsibility)
+- Keep methods focused (Single Responsibility)
 - Write comprehensive JavaDoc comments
-- Use Lombok annotations to reduce boilerplate
+- Use Lombok annotations to reduce boilerplate code
+- Implement proper exception handling
 
-### Creating New Entities
+### [ENTITY] Creating New Entities
 
 ```java
 @Entity
@@ -772,7 +968,7 @@ public class MyEntity extends BaseEntity {
 }
 ```
 
-### Creating New Services
+### [SERVICE] Creating New Services
 
 ```java
 @Service
@@ -784,21 +980,21 @@ public class MyService {
     private final Executor myExecutor;  // Inject if async needed
     
     public MyEntity create(MyRequest request) {
+        log.info("Creating new entity: {}", request.getName());
         MyEntity entity = new MyEntity();
         entity.setName(request.getName());
-        // ... set other fields
         return repository.save(entity);
     }
     
     @Async("myExecutor")
     public CompletableFuture<Void> processAsync() {
-        // Async processing
+        log.debug("Starting async processing");
         return CompletableFuture.completedFuture(null);
     }
 }
 ```
 
-### Creating New Endpoints
+### [ENDPOINT] Creating New Endpoints
 
 ```java
 @RestController
@@ -810,25 +1006,29 @@ public class MyController {
     private final MyService service;
     
     @PostMapping
-    public ResponseEntity<ApiResponse<MyResponse>> create(@Valid @RequestBody MyRequest request) {
+    public ResponseEntity<ApiResponse<MyResponse>> create(
+            @Valid @RequestBody MyRequest request) {
         MyEntity entity = service.create(request);
         return ResponseEntity.ok(
-            ApiResponse.success("Resource created successfully", mapper.toResponse(entity))
+            ApiResponse.success("Resource created successfully", 
+                mapper.toResponse(entity))
         );
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<MyResponse>> getById(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<MyResponse>> getById(
+            @PathVariable String id) {
         MyEntity entity = service.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Resource not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Not found"));
         return ResponseEntity.ok(
-            ApiResponse.success("Resource retrieved successfully", mapper.toResponse(entity))
+            ApiResponse.success("Resource retrieved", 
+                mapper.toResponse(entity))
         );
     }
 }
 ```
 
-### Testing
+### [TEST] Testing
 
 Create tests in `src/test/java` following the same package structure:
 
@@ -845,10 +1045,11 @@ class MyServiceTest {
     
     @Test
     void testCreate() {
-        MyRequest request = new MyRequest("Test", "Description");
-        MyEntity entity = new MyEntity(null, "Test", "Description");
+        MyRequest request = new MyRequest("Test");
+        MyEntity entity = new MyEntity(null, "Test");
         
-        when(repository.save(any(MyEntity.class))).thenReturn(entity);
+        when(repository.save(any(MyEntity.class)))
+            .thenReturn(entity);
         
         MyEntity result = service.create(request);
         
@@ -861,7 +1062,7 @@ class MyServiceTest {
 
 ## Contributing
 
-### Development Workflow
+### [WORKFLOW] Development Workflow
 
 1. **Create a Feature Branch**
    ```bash
@@ -889,7 +1090,7 @@ class MyServiceTest {
    - Reference any related issues
    - Ensure CI/CD checks pass
 
-### Commit Message Format
+### [COMMIT] Commit Message Format
 
 ```
 <type>: <subject>
@@ -914,7 +1115,7 @@ Closes #123
 
 ## Troubleshooting
 
-### Common Issues
+### [ISSUES] Common Issues
 
 #### 1. Database Connection Failed
 ```
@@ -977,12 +1178,14 @@ Error: Address already in use: 0.0.0.0:5000
 server:
   port: 5001
 
-# Or kill existing process
-lsof -i :5000  # macOS/Linux
-Get-Process -Id (Get-NetTCPConnection -LocalPort 5000).OwningProcess  # Windows
+# Or kill existing process (macOS/Linux)
+lsof -i :5000
+
+# Or (Windows)
+Get-Process -Id (Get-NetTCPConnection -LocalPort 5000).OwningProcess
 ```
 
-### Debug Mode
+### [DEBUG] Debug Mode
 
 Run with debug output:
 ```bash
@@ -992,7 +1195,7 @@ Run with debug output:
 ./mvnw spring-boot:run -Dlogging.level.com.mamadou.payflow=TRACE
 ```
 
-### Database Schema Reset
+### [RESET] Database Schema Reset
 
 ```bash
 # Delete PostgreSQL container and volume
@@ -1001,12 +1204,12 @@ docker-compose down -v
 # Recreate containers
 docker-compose up -d
 
-# Application will auto-create schema on startup (ddl-auto: create)
+# Application will auto-create schema on startup
 ```
 
 ## Performance Monitoring
 
-### View Metrics
+### [METRICS] View Metrics
 
 ```bash
 # All available metrics
@@ -1019,17 +1222,18 @@ curl http://localhost:5000/actuator/metrics/http.server.requests
 curl http://localhost:5000/actuator/prometheus
 ```
 
-### Health Checks
+### [HEALTH] Health Checks
 
 ```bash
 # Detailed health (requires authentication)
-curl -H "Authorization: Bearer {token}" http://localhost:5000/actuator/health
+curl -H "Authorization: Bearer {token}" \
+  http://localhost:5000/actuator/health
 
 # Basic health
 curl http://localhost:5000/actuator/health/readiness
 ```
 
-### Logs
+### [LOGS] Application Logs
 
 ```bash
 # View logs
@@ -1044,27 +1248,38 @@ tail -f logs/payflow.log | grep WARN
 
 ## Security Considerations
 
-1. **Credentials Management**
-   - Never commit credentials to repository
-   - Use environment variables for secrets
-   - Rotate JWT secrets regularly
+### [CREDENTIALS] Credentials Management
+- Never commit credentials to repository
+- Use environment variables for secrets
+- Rotate JWT secrets regularly
+- Store sensitive data in secure vaults
 
-2. **Database Security**
-   - Use strong passwords for database
-   - Enable SSL/TLS for database connections
-   - Implement row-level security if needed
+### [DATABASE] Database Security
+- Use strong passwords for database
+- Enable SSL/TLS for database connections
+- Implement row-level security if needed
+- Regular backups and disaster recovery plans
 
-3. **API Security**
-   - Use HTTPS in production
-   - Implement rate limiting
-   - Validate all inputs
-   - Use CORS appropriately
+### [SHIELD] API Security
+- Use HTTPS in production
+- Implement rate limiting per IP/user
+- Validate all inputs (sanitization)
+- Use CORS appropriately
+- Implement request signing for sensitive operations
 
-4. **Authentication**
-   - Enforce strong password policies
-   - Implement MFA for admin accounts
-   - Use short-lived access tokens
-   - Implement secure token refresh
+### [AUTH] Authentication Best Practices
+- Enforce strong password policies
+- Implement MFA for admin accounts
+- Use short-lived access tokens (15 min)
+- Implement secure token refresh mechanism
+- Log authentication events
+
+### [PRODUCTION] Production Deployment
+- Use secrets management (Vault, AWS Secrets Manager)
+- Enable request/response encryption
+- Implement comprehensive logging
+- Set up monitoring and alerting
+- Regular security audits and penetration testing
 
 ## License
 

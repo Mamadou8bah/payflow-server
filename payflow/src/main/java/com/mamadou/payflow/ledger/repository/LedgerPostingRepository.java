@@ -1,0 +1,25 @@
+package com.mamadou.payflow.ledger.repository;
+
+import com.mamadou.payflow.ledger.entity.LedgerPosting;
+import com.mamadou.payflow.ledger.enums.LedgerPostingSide;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Repository
+public interface LedgerPostingRepository extends JpaRepository<LedgerPosting, Long> {
+    List<LedgerPosting> findByTraceIdOrderByIdAsc(String traceId);
+    List<LedgerPosting> findByAccount_CodeOrderByPostedAtDesc(String accountCode);
+    boolean existsByTraceId(String traceId);
+
+    @Query("""
+            select coalesce(sum(p.amount), 0)
+            from LedgerPosting p
+            where p.account.id = :accountId and p.side = :side
+            """)
+    BigDecimal sumByAccountIdAndSide(@Param("accountId") Long accountId, @Param("side") LedgerPostingSide side);
+}

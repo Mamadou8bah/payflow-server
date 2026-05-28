@@ -29,6 +29,7 @@ public class APIKey {
     private String secretHash;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean revoked = false;
 
     private LocalDateTime expiresAt;

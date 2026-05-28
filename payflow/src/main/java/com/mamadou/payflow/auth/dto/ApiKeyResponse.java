@@ -1,8 +1,12 @@
 package com.mamadou.payflow.auth.dto;
 
+import java.time.LocalDateTime;
+
 public record ApiKeyResponse(
         String name,
-        int expiresInDays,
+        String publicId,
+        LocalDateTime expiresAt,
+        boolean revoked,
         String apiKey
 ) {
 

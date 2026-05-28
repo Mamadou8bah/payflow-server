@@ -6,12 +6,12 @@ import com.mamadou.payflow.auth.entity.APIKey;
 import com.mamadou.payflow.auth.repository.APIKeyRepository;
 import com.mamadou.payflow.common.Exception.APIKeyNotFoundException;
 import com.mamadou.payflow.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -33,14 +33,15 @@ public class APIKeyService {
     public ApiKeyResponse createApiKey(APIKeyCreateRequest request) {
         String userName= SecurityContextHolder.getContext().getAuthentication().getName();
 
-        var user= userRepository.findByEmail(userName).orElseThrow(
+        var user= userRepository.findByLoginIdentifier(userName).orElseThrow(
                 () -> new UsernameNotFoundException("Username not found")
         );
-        String apiToken = generatePublicId()+"."+generateSecret();
+        String publicId = generatePublicId();
+        String apiToken = publicId+"."+generateSecret();
         var apiKey= APIKey.builder()
                 .name(request.name())
                 .expiresAt(LocalDateTime.now().plusDays(request.expiresInDays()))
-                .publicId(generatePublicId())
+                .publicId(publicId)
                 .secretHash(passwordEncoder.encode(apiToken))
                 .createdAt(LocalDateTime.now())
                 .user(user)
@@ -48,7 +49,9 @@ public class APIKeyService {
         apiKeyRepository.save(apiKey);
         return new ApiKeyResponse(
                 request.name(),
-                request.expiresInDays(),
+                apiKey.getPublicId(),
+                apiKey.getExpiresAt(),
+                apiKey.isRevoked(),
                 apiToken
         );
     }
@@ -62,14 +65,16 @@ public class APIKeyService {
         apiKeyRepository.save(apiKey);
         return new ApiKeyResponse(
                 request.name(),
-                apiKey.getExpiresAt().getDayOfYear(),
-                apiKey.getPublicId()
+                apiKey.getPublicId(),
+                apiKey.getExpiresAt(),
+                apiKey.isRevoked(),
+                null
         );
     }
 
     @Transactional
     public String revokeApiKey(String apiKey) {
-        String[]apiKeys=apiKey.split(".");
+        String[]apiKeys=apiKey.split("\\.", 2);
         String publicId=apiKeys[0];
         APIKey apiKey1=apiKeyRepository.findByPublicId(publicId).orElseThrow(
                 ()->new APIKeyNotFoundException("API key not found")
@@ -81,7 +86,7 @@ public class APIKeyService {
 
     @Transactional
     public String deleteApiKey(String apiKey) {
-        String[]apiKeys=apiKey.split(".");
+        String[]apiKeys=apiKey.split("\\.", 2);
         String publicId=apiKeys[0];
         APIKey apiKey1=apiKeyRepository.findByPublicId(publicId).orElseThrow(
                 ()->new APIKeyNotFoundException("API key not found")

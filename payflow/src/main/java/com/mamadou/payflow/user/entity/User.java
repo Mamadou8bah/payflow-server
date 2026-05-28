@@ -75,6 +75,16 @@ public class User implements UserDetails {
 
     private Integer failedLoginAttempts;
 
+    @Column(nullable = false)
+    private boolean twoFactorEnabled;
+
+    private String twoFactorCodeHash;
+
+    private String twoFactorChallengeId;
+
+    private LocalDateTime twoFactorCodeExpiresAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshToken> refreshTokens;
 
     @Enumerated(EnumType.STRING)

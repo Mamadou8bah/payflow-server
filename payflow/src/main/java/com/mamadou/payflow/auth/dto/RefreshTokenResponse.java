@@ -1,4 +1,9 @@
 package com.mamadou.payflow.auth.dto;
 
-public class RefreshTokenResponse {
+public record RefreshTokenResponse(
+        String accessToken,
+        String refreshToken,
+        String tokenType,
+        long expiresInSeconds
+) {
 }

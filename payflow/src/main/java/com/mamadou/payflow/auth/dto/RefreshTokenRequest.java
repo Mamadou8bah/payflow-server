@@ -1,4 +1,8 @@
 package com.mamadou.payflow.auth.dto;
 
-public class RefreshTokenRequest {
+import jakarta.validation.constraints.NotBlank;
+
+public record RefreshTokenRequest(
+        @NotBlank String refreshToken
+) {
 }

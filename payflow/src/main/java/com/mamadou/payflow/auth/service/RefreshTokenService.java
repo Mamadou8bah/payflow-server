@@ -31,11 +31,11 @@ public class RefreshTokenService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "refresh_token");
         claims.put("role", user.getRole().name());
-        claims.put("email", user.getEmail());
+        claims.put("username", user.getUsername());
         claims.put("userId", user.getId());
 
         String rawRefreshToken = jwtConfig.generateRefreshToken(
-                user.getEmail(),
+                user.getUsername(),
                 tokenId,
                 claims
         );
@@ -80,13 +80,17 @@ public class RefreshTokenService {
 
         User user = storedToken.getUser();
 
+        return generateAccessToken(user);
+    }
+
+    public String generateAccessToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "access_token");
         claims.put("role", user.getRole().name());
-        claims.put("email", user.getEmail());
+        claims.put("username", user.getUsername());
         claims.put("userId", user.getId());
 
-        return jwtConfig.generateAccessToken(user.getEmail(), claims);
+        return jwtConfig.generateAccessToken(user.getUsername(), claims);
     }
 
     @Transactional
@@ -121,5 +125,21 @@ public class RefreshTokenService {
             token.setRevoked(true);
         }
         refreshTokenRepository.saveAll(activeTokens);
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserForRefreshToken(String rawRefreshToken) {
+        if (!jwtConfig.validateToken(rawRefreshToken)) {
+            throw new InvalidTokenException("Invalid refresh token");
+        }
+
+        String tokenId = jwtConfig.extractTokenId(rawRefreshToken);
+        RefreshToken storedToken = refreshTokenRepository.findByTokenId(tokenId)
+                .orElseThrow(() -> new InvalidTokenException("Invalid refresh token"));
+
+        if (!bCryptPasswordEncoder.matches(rawRefreshToken, storedToken.getTokenHash())) {
+            throw new InvalidTokenException("Invalid refresh token");
+        }
+        return storedToken.getUser();
     }
 }

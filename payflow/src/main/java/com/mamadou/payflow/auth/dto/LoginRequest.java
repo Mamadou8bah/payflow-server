@@ -1,4 +1,11 @@
 package com.mamadou.payflow.auth.dto;
 
-public class LoginRequest {
+import jakarta.validation.constraints.NotBlank;
+
+public record LoginRequest(
+        @NotBlank String username,
+        @NotBlank String password,
+        String twoFactorChallengeId,
+        String twoFactorCode
+) {
 }

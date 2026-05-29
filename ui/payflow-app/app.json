@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Payflow App",
+    "slug": "payflow-app",
+    "scheme": "payflowapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android", "web"],
+    "assetBundlePatterns": ["**/*"]
+  }
+}

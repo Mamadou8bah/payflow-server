@@ -1,0 +1,182 @@
+spring:
+  application:
+    name: payflow
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/payflow}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+  
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT:6379}
+    database: ${REDIS_DATABASE:0}
+    password: ${REDIS_PASSWORD}
+    timeout: 2000
+    lettuce:
+      pool:
+        max-active: 20
+        max-idle: 10
+        min-idle: 5
+  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000  # 10 minutes in milliseconds
+
+  # OpenAPI / Swagger Configuration (disabled in prod)
+  openapi:
+    version: v1.0.0
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: false
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: false
+
+server:
+  port: ${SERVER_PORT:5000}
+  servlet:
+    session:
+      timeout: 30m
+  shutdown: graceful
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    accept-count: 100
+    max-connections: 10000
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration-minutes: ${JWT_ACCESS_TOKEN_EXPIRATION_MINUTES:15}
+  refresh-token-expiration-days: ${JWT_REFRESH_TOKEN_EXPIRATION_DAYS:7}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+    metrics:
+      enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+  metrics:
+    enable:
+      jvm: true
+      process: true
+      system: true
+      tomcat: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        auth.login.duration: true
+        transfer.execution.duration: true
+        risk.evaluation.duration: true
+        ledger.posting.duration: true
+        webhook.processing.duration: true
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    root: WARN
+    com.mamadou.payflow: INFO
+    org.springframework.web: WARN
+    org.hibernate: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{correlationId}] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{correlationId}] %-5level %logger{36} - %msg%n"
+  file:
+    name: /app/logs/payflow.log
+    max-size: 100MB
+    max-history: 30
+    total-size-cap: 10GB
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 30
+      total-size-cap: 10GB
+
+payflow:
+  notifications:
+    sms:
+      provider: ${PAYFLOW_SMS_PROVIDER:noop}
+      twilio:
+        account-sid: ${TWILIO_ACCOUNT_SID}
+        auth-token: ${TWILIO_AUTH_TOKEN}
+        from-number: ${TWILIO_FROM_NUMBER}
+    email:
+      provider: ${PAYFLOW_EMAIL_PROVIDER:noop}
+      api-key: ${PAYFLOW_EMAIL_API_KEY}
+      from: ${PAYFLOW_EMAIL_FROM:no-reply@payflow.local}
+  
+  webhooks:
+    modempay:
+      signing-secret: ${MODEMPAY_WEBHOOK_SIGNING_SECRET}
+      signature-header: ${MODEMPAY_WEBHOOK_SIGNATURE_HEADER:X-ModemPay-Signature}
+  
+  ratelimit:
+    # Per-user rate limiting
+    login:
+      requests: 5
+      window-seconds: 60
+    refresh:
+      requests: 10
+      window-seconds: 60
+    # Per-API-key rate limiting
+    api-key:
+      requests: 1000
+      window-seconds: 3600
+    # Default rate limit per user
+    default:
+      requests: 100
+      window-seconds: 60
+  webhooks:
+    modempay:
+      signing-secret: ${MODEMPAY_WEBHOOK_SECRET}
+      signature-header: ${MODEMPAY_WEBHOOK_SIGNATURE_HEADER:X-ModemPay-Signature}
+      api-key: ${MODEMPAY_API_KEY}
+      public-key: ${MODEMPAY_PUBLIC_KEY}
+      api-url: ${MODEMPAY_API_URL}
+  
+  risk:
+    critical-threshold: ${PAYFLOW_RISK_CRITICAL_THRESHOLD:9.0}
+    high-threshold: ${PAYFLOW_RISK_HIGH_THRESHOLD:7.0}
+    medium-threshold: ${PAYFLOW_RISK_MEDIUM_THRESHOLD:5.0}
+    block-critical: ${PAYFLOW_RISK_BLOCK_CRITICAL:true}
+    block-high: ${PAYFLOW_RISK_BLOCK_HIGH:false}
+    daily-threshold: ${PAYFLOW_RISK_DAILY_THRESHOLD:50000}
+    daily-transaction-count: ${PAYFLOW_RISK_DAILY_TRANSACTION_COUNT:20}
+    rapid-transfer-window-seconds: ${PAYFLOW_RISK_RAPID_TRANSFER_WINDOW_SECONDS:300}
+    rapid-transfer-count: ${PAYFLOW_RISK_RAPID_TRANSFER_COUNT:5}
+    new-wallet-age-days: ${PAYFLOW_RISK_NEW_WALLET_AGE_DAYS:7}
+    new-wallet-high-value-threshold: ${PAYFLOW_RISK_NEW_WALLET_HIGH_VALUE_THRESHOLD:10000}

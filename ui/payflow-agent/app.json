@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Payflow Agent",
+    "slug": "payflow-agent",
+    "scheme": "payflowagent",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android", "web"],
+    "assetBundlePatterns": ["**/*"]
+  }
+}

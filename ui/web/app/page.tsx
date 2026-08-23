@@ -1,4 +1,5 @@
-import { FaqSection } from "./faq-section";
+import { LandingHeader } from "./landing-header";
+import { footerColumns, headerNavGroups } from "./site-nav";
 
 const audienceCards = [
   {
@@ -120,49 +121,6 @@ const proofStats = [
   ["Operational control", "Risk flags, reconciliation, and audit trail"],
 ];
 
-const faqSections = [
-  {
-    title: "Sending money",
-    description: "For customers moving money, checking balances, and reviewing payment activity.",
-    questions: [
-      "Are wallet-to-wallet transfers really free?",
-      "How quickly does money move between Payflow wallets?",
-      "Can customers see their balance and transaction history?",
-      "What happens if a customer sends money to the wrong wallet?",
-    ],
-  },
-  {
-    title: "Getting paid",
-    description: "For merchants collecting payments through links, checkout flows, and status updates.",
-    questions: [
-      "Can merchants create payment links for customers?",
-      "How do merchants know when a payment succeeds or fails?",
-      "Can payment status updates be sent through webhooks?",
-      "Where can merchants track collections and customer payments?",
-    ],
-  },
-  {
-    title: "Building with Payflow",
-    description: "For developers integrating wallets, payment links, transfers, and webhooks.",
-    questions: [
-      "Does Payflow provide documented API endpoints?",
-      "Can developers build wallet and transfer flows with the API?",
-      "Are webhook events available for payment lifecycle updates?",
-      "How does Payflow support reliable integrations?",
-    ],
-  },
-  {
-    title: "Account help",
-    description: "For users who need support with access, limits, reversals, and payment issues.",
-    questions: [
-      "Can Payflow require extra verification for sensitive actions?",
-      "What should users do when a payment needs review?",
-      "Can balances be frozen or limited for safety?",
-      "How are reversals and reconciliation handled?",
-    ],
-  },
-];
-
 const customerHighlights = [
   "Secure login with 2FA when required",
   "Visible transaction history and balance state",
@@ -263,21 +221,6 @@ const appStoreOptions = [
   },
 ];
 
-const footerColumns = [
-  {
-    title: "Product",
-    links: ["Customer checkout", "Merchant collections", "Wallet transfers", "Developer docs"],
-  },
-  {
-    title: "Company",
-    links: ["About Payflow", "Security", "Compliance", "Contact sales"],
-  },
-  {
-    title: "Resources",
-    links: ["API reference", "Status page", "Help center", "Release notes"],
-  },
-];
-
 const socialLinks = [
   {
     name: "X",
@@ -326,108 +269,29 @@ const socialLinks = [
   },
 ];
 
-const headerNavGroups = [
-  {
-    label: "Customers",
-    links: [
-      { label: "Wallet app", href: "/app" },
-      { label: "Checkout experience", href: "#audiences" },
-      { label: "Transaction history", href: "/customers/transactions" },
-    ],
-  },
-  {
-    label: "Merchants",
-    links: [
-      { label: "Payment links", href: "/signup" },
-      { label: "Collections", href: "#audiences" },
-      { label: "Webhook updates", href: "/merchants/webhooks" },
-    ],
-  },
-  {
-    label: "Developers",
-    links: [
-      { label: "Developer docs", href: "/docs" },
-      { label: "API reference", href: "/docs#api" },
-      { label: "Integration guide", href: "/developers/integration" },
-    ],
-  },
-  {
-    label: "Operations",
-    links: [
-      { label: "Risk controls", href: "#capabilities" },
-      { label: "Reconciliation", href: "/operations/reconciliation" },
-      { label: "Admin dashboard", href: "/dashboard" },
-    ],
-  },
-  {
-    label: "Resources",
-    links: [
-      { label: "Why choose us", href: "#capabilities" },
-      { label: "FAQ", href: "#faq" },
-      { label: "Contact sales", href: "#cta" },
-    ],
-  },
-];
-
 export default function HomePage() {
   return (
-    <main className="bg-slate-100 text-slate-900">
-      <header className="sticky top-0 z-[9999] border-b border-slate-200 bg-white backdrop-blur">
-        <div className="mx-auto grid w-[min(1280px,calc(100%-2rem))] grid-cols-[auto_1fr_auto] items-center gap-4 py-3.5">
-          <a href="/" className="flex items-center">
-            <img
-              src="https://res.cloudinary.com/dflsnes44/image/upload/v1780228196/payflow_no_bg_f0l7on.png"
-              alt="Payflow"
-              className="h-10 w-10 origin-left scale-[1.75] object-contain md:scale-[2] lg:scale-[2.25]"
-            />
-          </a>
-
-          <nav className="hidden items-center justify-center gap-2 text-base font-semibold text-slate-700 md:flex">
-            {headerNavGroups.map((group) => (
-              <div key={group.label} className="group relative">
-                <button className="flex items-center gap-1.5 rounded-full px-4 py-2 transition-colors hover:bg-slate-100 hover:text-slate-950" type="button">
-                  {group.label}
-                  <svg viewBox="0 0 20 20" className="h-4 w-4 text-slate-500 transition-transform group-hover:rotate-180" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" />
-                  </svg>
-                </button>
-                <div className="invisible absolute left-1/2 top-full z-[10000] mt-3 w-64 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-2 opacity-0 shadow-[0_22px_55px_rgba(15,23,42,0.14)] transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                  <div className="absolute -top-3 left-0 h-3 w-full" />
-                  {group.links.map((link) => (
-                    <a key={link.label} href={link.href} className="block rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-orange-50 hover:text-orange-700">
-                      {link.label}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-3 justify-self-end">
-            <a className="rounded-full bg-orange-600 px-5 py-2 text-sm font-bold text-white" href="/signup">Get started</a>
-            <a className="rounded-full border border-slate-900 px-5 py-2 text-sm font-bold text-slate-900" href="/login">LOG IN</a>
-          </div>
-        </div>
-      </header>
-
-      <section className="bg-white py-16 md:py-20" id="how">
-        <div className="mx-auto grid w-[min(1280px,calc(100%-2rem))] items-center gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(380px,0.85fr)]">
+    <>
+      <LandingHeader groups={headerNavGroups} />
+      <main className="overflow-x-clip bg-slate-100 text-slate-900">
+      <section className="bg-white py-12 md:py-20" id="how">
+        <div className="mx-auto grid w-[min(1280px,calc(100%-1.5rem))] items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.85fr)] lg:gap-12">
           <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.28em] text-orange-600">THE GLOBAL NETWORK FOR SERIOUS PAYMENTS</p>
-            <h1 className="mt-4 text-[3rem]  leading-[0.98] tracking-[-0.04em] text-slate-800">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-orange-600 sm:text-sm sm:tracking-[0.28em]">THE GLOBAL NETWORK FOR SERIOUS PAYMENTS</p>
+            <h1 className="mt-4 text-[clamp(2rem,8vw,3rem)] leading-[1.02] tracking-[-0.04em] text-slate-800">
               A payments platform built for customers, merchants, and operators.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-600 md:text-xl">
               Payflow connects customer checkout, merchant payment links, wallets, free wallet-to-wallet transfers, risk, and reconciliation in one platform. It keeps the payment journey simple for users and observable for the teams that run it.
             </p>
 
-            <div className="mt-8 flex items-center gap-3 text-slate-700">
-              <span className="grid h-6 w-6 place-items-center rounded-full border-2 border-orange-500 text-orange-500">✓</span>
-              <p className="font-semibold">Free wallet-to-wallet transfers, merchant collections, and operational controls in one place.</p>
+            <div className="mt-8 flex items-start gap-3 text-slate-700 sm:items-center">
+              <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 border-orange-500 text-orange-500">✓</span>
+              <p className="text-sm font-semibold sm:text-base">Free wallet-to-wallet transfers, merchant collections, and operational controls in one place.</p>
             </div>
 
-            <div className="mt-9 flex flex-wrap items-center gap-4">
-              <a href="/signup" className="rounded-full bg-orange-600 px-10 py-4 text-base font-bold text-white shadow-[0_14px_30px_rgba(249,115,22,0.28)]">Get started</a>
+            <div className="mt-8 flex flex-col gap-4 sm:mt-9 sm:flex-row sm:flex-wrap sm:items-center">
+              <a href="/signup" className="inline-flex justify-center rounded-full bg-orange-600 px-8 py-3.5 text-base font-bold text-slate-900 sm:px-10 sm:py-4">Get started</a>
               <div className="flex flex-col">
                 <p className="text-sm font-black uppercase tracking-[0.16em] text-emerald-600">Merchant-ready</p>
                 <p className="text-sm text-slate-500">Payment links, webhooks, free wallet transfers, and collections workflows</p>
@@ -436,14 +300,14 @@ export default function HomePage() {
           </div>
 
           <div className="relative flex justify-center lg:justify-end">
-            <div className="relative h-[500px] w-full max-w-[500px] overflow-hidden rounded-[3rem] rounded-br-[10rem] bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.24),transparent_36%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_24%),linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)] p-6 shadow-[0_30px_80px_rgba(15,23,42,0.10)]">
+            <div className="relative h-[min(420px,70vw)] w-full max-w-[500px] overflow-hidden rounded-[2rem] rounded-br-[5rem] bg-[radial-gradient(circle_at_top_left,rgba(222,187,48,0.24),transparent_36%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_24%),linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)] p-4 sm:h-[500px] sm:rounded-[3rem] sm:rounded-br-[10rem] sm:p-6">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_55%,rgba(17,24,39,0.86),rgba(17,24,39,0.18)_34%,transparent_62%)]" />
               <img
                 src="https://res.cloudinary.com/dflsnes44/image/upload/v1780151927/wp_vznega.jpg"
                 alt="Payflow customer and merchant visual"
-                className="relative z-10 h-full w-full rounded-[2.4rem] rounded-br-[8rem] object-cover object-center shadow-[0_24px_60px_rgba(15,23,42,0.24)]"
+                className="relative z-10 h-full w-full rounded-[1.6rem] rounded-br-[4rem] object-cover object-center sm:rounded-[2.4rem] sm:rounded-br-[8rem]"
               />
-              <div className="absolute left-6 top-6 z-20 rounded-full border border-white/60 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-600 backdrop-blur">
+              <div className="absolute left-4 top-4 z-20 rounded-full border border-white/60 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-600 sm:left-6 sm:top-6 sm:px-4 sm:py-2 sm:text-xs sm:tracking-[0.18em]">
                 Customer and merchant experience
               </div>
             </div>
@@ -451,35 +315,30 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-20 md:py-24" id="audiences">
+      <section className="py-12 md:py-16" id="audiences">
         <div className="mx-auto w-[min(1280px,calc(100%-2rem))]">
-
-          <div className="grid gap-12 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-8 md:grid-cols-2 md:gap-10 xl:grid-cols-4">
             {audienceCards.map((item) => (
               <article key={item.title} className="max-w-sm">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white">
                   {renderAudienceIcon(item.title)}
                 </div>
-                <h3 className="mt-7 text-2xl font-black leading-tight text-slate-900">{item.title}</h3>
-                <p className="mt-4 text-lg leading-relaxed text-slate-600">{item.text}</p>
+                <h3 className="mt-4 text-2xl font-black leading-tight text-slate-900">{item.title}</h3>
+                <p className="mt-2 text-base leading-relaxed text-slate-600 sm:text-lg">{item.text}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16">
-
-      </section>
-
-      <section className="bg-orange-600 py-16 text-white">
+      <section className="bg-orange-600 py-16 text-slate-900">
         <div className="mx-auto w-[min(1280px,calc(100%-2rem))]">
-          <h2 className="text-center text-5xl font-black">Get the Payflow apps</h2>
-          <p className="mt-4 text-center text-lg text-white/90">Start with the Play Store or App Store — or download directly for other platforms.</p>
+          <h2 className="text-center text-3xl font-black sm:text-4xl md:text-5xl">Get the Payflow apps</h2>
+          <p className="mt-4 text-center text-base text-slate-800 sm:text-lg">Start with the Play Store or App Store — or download directly for other platforms.</p>
 
           <div className="mt-10 relative overflow-hidden">
-            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-orange-600 to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-orange-600 to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-orange-600 to-transparent sm:w-20" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-orange-600 to-transparent sm:w-20" />
 
             <div className="app-marquee-track flex w-max gap-6 py-2">
               {[...appStoreOptions, ...appStoreOptions].map((item, index) => (
@@ -488,7 +347,7 @@ export default function HomePage() {
                   href={item.href}
                   target={item.href.startsWith("/") ? undefined : "_blank"}
                   rel={item.href.startsWith("/") ? undefined : "noopener noreferrer"}
-                  className="group flex h-40 w-[16rem] items-center justify-center gap-5 px-4 text-slate-300 transition-transform duration-300 hover:-translate-y-1 md:w-[18rem] md:px-5"
+                  className="group flex h-32 w-[13rem] items-center justify-center gap-4 px-3 text-slate-800 transition-transform duration-300 hover:-translate-y-1 sm:h-40 sm:w-[16rem] sm:gap-5 sm:px-4 md:w-[18rem] md:px-5"
                 >
                   <div className="flex h-24 w-24 shrink-0 items-center justify-center">
                     {item.icon}
@@ -501,33 +360,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#f4f6fb] py-20 md:py-24" id="capabilities">
-        <div className="relative mx-auto grid w-[min(1280px,calc(100%-2rem))] gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(420px,0.75fr)]">
+      <section className="bg-[#f4f6fb] py-16 md:py-24" id="capabilities">
+        <div className="relative mx-auto grid w-[min(1280px,calc(100%-1.5rem))] gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.75fr)] lg:gap-12">
           <div className="lg:sticky lg:top-28 lg:h-[calc(100vh-7rem)] lg:py-8">
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-600">Why choose us</p>
-            <h2 className="mt-5 max-w-3xl text-4xl font-black leading-tight text-slate-950 md:text-6xl">
+            <h2 className="mt-5 max-w-3xl text-3xl font-black leading-tight text-slate-950 sm:text-4xl md:text-6xl">
               What makes Payflow different?
             </h2>
-            <p className="mt-8 max-w-2xl text-2xl font-black leading-tight text-slate-900">
+            <p className="mt-6 max-w-2xl text-xl font-black leading-tight text-slate-900 sm:mt-8 sm:text-2xl">
               Built around customers, merchants, and developers.
             </p>
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-slate-600 md:text-xl">
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 md:text-xl">
               Payflow gives customers free wallet-to-wallet transfers, gives merchants practical ways to collect, and gives developers the APIs and webhooks to build reliable payment experiences. The platform stays simple on the surface while still giving operators the controls they need behind the scenes.
             </p>
-            <a href="/login" className="mt-9 inline-flex rounded-full bg-orange-600 px-9 py-4 text-base font-bold text-white shadow-[0_14px_30px_rgba(249,115,22,0.28)]">
+            <a href="/login" className="mt-8 inline-flex rounded-full bg-orange-600 px-8 py-3.5 text-base font-bold text-slate-900 sm:mt-9 sm:px-9 sm:py-4">
               Get started
             </a>
           </div>
 
-          <div className="space-y-10 lg:pb-[12vh]">
+          <div className="space-y-6 lg:space-y-10 lg:pb-[12vh]">
             {whyChooseItems.map((item) => (
-              <article key={item.title} className="flex min-h-[70vh] items-start justify-center pt-2 lg:items-center">
-                <div className="flex min-h-[26rem] w-full max-w-[36rem] flex-col items-center justify-center rounded-[2rem] bg-white px-10 py-14 text-center shadow-[0_35px_90px_rgba(15,23,42,0.10)] md:px-14">
-                  <div className="mb-9 flex h-24 w-24 items-center justify-center rounded-2xl bg-orange-50">
+              <article key={item.title} className="flex min-h-0 items-start justify-center pt-2 lg:min-h-[70vh] lg:items-center">
+                <div className="flex min-h-0 w-full max-w-[36rem] flex-col items-center justify-center rounded-[1.75rem] border border-slate-200 bg-white px-6 py-10 text-center sm:px-10 sm:py-14 md:min-h-[26rem] md:rounded-[2rem] md:px-14">
+                  <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-50 sm:mb-9 sm:h-24 sm:w-24">
                     {renderAudienceIcon(item.iconTitle)}
                   </div>
-                  <h3 className="max-w-md text-3xl font-black leading-tight text-slate-950">{item.title}</h3>
-                  <p className="mt-6 max-w-md text-lg leading-relaxed text-slate-600">{item.text}</p>
+                  <h3 className="max-w-md text-2xl font-black leading-tight text-slate-950 sm:text-3xl">{item.title}</h3>
+                  <p className="mt-4 max-w-md text-base leading-relaxed text-slate-600 sm:mt-6 sm:text-lg">{item.text}</p>
                 </div>
               </article>
             ))}
@@ -539,7 +398,7 @@ export default function HomePage() {
         <div className="mx-auto grid w-[min(1280px,calc(100%-2rem))] items-start gap-8 md:grid-cols-2">
           <blockquote>
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-600">Customer and merchant trust</p>
-            <p className="mt-4 text-4xl font-black leading-tight text-slate-900 md:text-5xl">
+            <p className="mt-4 text-3xl font-black leading-tight text-slate-900 sm:text-4xl md:text-5xl">
               "Payflow gave our team a single command center for customer payments, merchant links, and risk incidents."
             </p>
             <footer className="mt-8">
@@ -548,7 +407,7 @@ export default function HomePage() {
             </footer>
           </blockquote>
 
-          <div className="rounded-[3rem]  shadow-xl">
+          <div className="rounded-[3rem]">
             <div className="">
               <div className="aspect-video w-full overflow-hidden rounded-lg">
                 <a
@@ -564,8 +423,8 @@ export default function HomePage() {
                     className="w-full h-full object-cover border-0"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="h-16 w-16 rounded-full bg-orange-600/95 flex items-center justify-center shadow-lg">
-                      <svg viewBox="0 0 24 24" className="h-8 w-8 text-white" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <div className="h-16 w-16 rounded-full bg-orange-600/95 flex items-center justify-center">
+                      <svg viewBox="0 0 24 24" className="h-8 w-8 text-slate-900" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     </div>
@@ -577,33 +436,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      <FaqSection sections={faqSections} />
-
       <footer className="bg-slate-50" id="cta">
-        <div className="w-full bg-white border-t border-b border-slate-100 py-16">
-          <div className="mx-auto w-[min(1280px,calc(100%-2rem))] p-8 md:p-10">
-            <div className="grid gap-10 border-b border-slate-100 pb-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+        <div className="w-full border-t border-b border-slate-100 bg-white py-8 md:py-10">
+          <div className="mx-auto w-[min(1280px,calc(100%-2rem))] px-4 md:px-6">
+            <div className="grid gap-6 border-b border-slate-100 pb-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.22em] text-orange-600">Payflow</p>
-                <h2 className="mt-4 text-4xl font-black leading-tight text-slate-900 md:text-5xl">Ready to launch with Payflow?</h2>
-                <p className="mt-5 max-w-3xl text-lg leading-relaxed text-slate-700 md:text-xl">
+                <h2 className="mt-3 text-3xl font-black leading-tight text-slate-900 md:text-4xl">Ready to launch with Payflow?</h2>
+                <p className="mt-3 max-w-3xl text-base leading-relaxed text-slate-700 md:text-lg">
                   Build customer payment flows, merchant collection tools, and operator controls with idempotency, risk checks, reconciliation workflows, and webhook notifications.
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-4 lg:justify-end">
-                <a className="rounded-full bg-orange-600 px-8 py-3 text-base font-black text-white transition-transform hover:-translate-y-0.5" href="/signup">Get started</a>
+              <div className="flex flex-wrap gap-3 lg:justify-end">
+                <a className="rounded-full bg-orange-600 px-8 py-3 text-base font-black text-slate-900 transition-transform hover:-translate-y-0.5" href="/signup">Get started</a>
                 <a className="rounded-full border border-slate-900 px-8 py-3 text-base font-black text-slate-900 transition-colors hover:bg-slate-50" href="/docs">Developer docs</a>
               </div>
             </div>
 
-            <div className="mt-10 grid gap-10 lg:grid-cols-[1.1fr_1.3fr]">
+            <div className="mt-6 space-y-8">
               <div>
                 <p className="max-w-xl text-sm leading-relaxed text-slate-600 md:text-base">
                   A payments platform for customers, merchants, operators, and developers. Secure, observable, and built for production money movement.
                 </p>
 
-                <div className="mt-8 flex flex-wrap gap-4">
+                <div className="mt-4 flex flex-wrap gap-3">
                   {socialLinks.map((social) => (
                     <a
                       key={social.name}
@@ -611,7 +468,7 @@ export default function HomePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={social.name}
-                      className="inline-flex h-11 w-11 items-center justify-center rounded-full text-slate-700 border border-slate-100 transition-colors hover:bg-slate-50 hover:text-orange-600"
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-100 text-slate-700 transition-colors hover:bg-slate-50 hover:text-orange-600"
                     >
                       {social.icon}
                     </a>
@@ -619,14 +476,16 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="grid gap-8 sm:grid-cols-3">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {footerColumns.map((column) => (
                   <div key={column.title}>
                     <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-600">{column.title}</p>
-                    <ul className="mt-4 space-y-3 text-sm text-slate-700 md:text-base">
+                    <ul className="mt-3 space-y-2 text-sm text-slate-700 md:text-base">
                       {column.links.map((link) => (
-                        <li key={link}>
-                          <a href="#" className="transition-colors hover:text-orange-600">{link}</a>
+                        <li key={link.href + link.label}>
+                          <a href={link.href} className="transition-colors hover:text-orange-600">
+                            {link.label}
+                          </a>
                         </li>
                       ))}
                     </ul>
@@ -635,17 +494,30 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="mt-10 flex flex-col gap-4 border-t border-slate-100 pt-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
+            <div className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-4 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
               <p>© 2026 Payflow. All rights reserved.</p>
               <div className="flex flex-wrap gap-4">
-                <a href="#faq" className="hover:text-orange-600 text-slate-600">FAQ</a>
-                <a href="#capabilities" className="hover:text-orange-600 text-slate-600">Capabilities</a>
-                <a href="#audiences" className="hover:text-orange-600 text-slate-600">Who it serves</a>
+                <a href="/legal/privacy" className="text-slate-600 hover:text-orange-600">
+                  Privacy
+                </a>
+                <a href="/legal/terms" className="text-slate-600 hover:text-orange-600">
+                  Terms
+                </a>
+                <a href="/legal/cookies" className="text-slate-600 hover:text-orange-600">
+                  Cookies
+                </a>
+                <a href="/#capabilities" className="text-slate-600 hover:text-orange-600">
+                  Capabilities
+                </a>
+                <a href="/#audiences" className="text-slate-600 hover:text-orange-600">
+                  Who it serves
+                </a>
               </div>
             </div>
           </div>
         </div>
       </footer>
-    </main>
+      </main>
+    </>
   );
 }

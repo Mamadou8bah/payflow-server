@@ -172,7 +172,6 @@ export function AdminDashboardView() {
         return;
       }
     }
-    const walletId = Number(freezeForm.walletId);
     const wallet = data.wallets.find((w) => w.id === walletId);
     if (!wallet) return notify("error", `Wallet ${walletId} not found`);
     if (wallet.status === "SUSPENDED") return notify("error", `Wallet ${walletId} is already frozen`);
@@ -204,7 +203,6 @@ export function AdminDashboardView() {
         return;
       }
     }
-    const walletId = Number(unfreezeWalletId);
     const wallet = data.wallets.find((w) => w.id === walletId);
     if (!wallet) return notify("error", `Wallet ${walletId} not found`);
     if (wallet.status !== "SUSPENDED") return notify("error", `Wallet ${walletId} is not frozen`);
@@ -235,7 +233,6 @@ export function AdminDashboardView() {
         return;
       }
     }
-    const transactionId = Number(reverseForm.transactionId);
     const txn = data.transactions.find((t) => t.id === transactionId);
     if (!txn) return notify("error", `Transaction ${transactionId} not found`);
     if (txn.status === "REVERSED") return notify("error", `Transaction ${transactionId} is already reversed`);
@@ -653,15 +650,15 @@ export function AdminDashboardView() {
       {tab === "reconciliation" && (
         <div className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-3">
-            <article className="rounded-[1.5rem] bg-white p-4 shadow-md">
+            <article className="rounded-[1.5rem] border border-slate-200 bg-white p-4">
               <p className="text-xs font-bold uppercase text-slate-500">Unresolved mismatches</p>
               <p className="mt-2 text-2xl font-black text-rose-700">{data.reconciliationStatus.unresolvedMismatchCount}</p>
             </article>
-            <article className="rounded-[1.5rem] bg-white p-4 shadow-md">
+            <article className="rounded-[1.5rem] border border-slate-200 bg-white p-4">
               <p className="text-xs font-bold uppercase text-slate-500">Reports with gaps</p>
               <p className="mt-2 text-2xl font-black text-[#123c91]">{data.reconciliationStatus.reportsWithMismatches}</p>
             </article>
-            <article className="rounded-[1.5rem] bg-white p-4 shadow-md">
+            <article className="rounded-[1.5rem] border border-slate-200 bg-white p-4">
               <p className="text-xs font-bold uppercase text-slate-500">Status</p>
               <p className="mt-2 text-2xl font-black text-emerald-700">Live</p>
             </article>

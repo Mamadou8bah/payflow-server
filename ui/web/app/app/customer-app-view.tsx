@@ -104,7 +104,7 @@ function TransactionRow({ txn }: { txn: CustomerTransaction }) {
   const sign = isCredit ? "+" : "−";
 
   return (
-    <li className="flex items-center gap-3 rounded-[1.25rem] bg-white px-4 py-3.5 shadow-sm">
+    <li className="flex items-center gap-3 rounded-[1.25rem] border border-slate-200 bg-white px-4 py-3.5">
       {transactionIcon(txn.type)}
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-bold text-slate-900">{txn.counterparty}</p>
@@ -138,14 +138,14 @@ function WalletCard({
         <button
           type="button"
           onClick={onTopUp}
-          className="grid h-10 w-10 place-items-center rounded-full bg-white text-slate-900 shadow-md transition-transform hover:scale-105"
+          className="grid h-10 w-10 place-items-center rounded-full bg-white text-slate-900 transition-transform hover:scale-105"
           aria-label="Top up wallet"
         >
           <PlusIcon />
         </button>
       </div>
 
-      <div className="-mt-6 mx-1 rounded-[1.75rem] bg-gradient-to-br from-[#123c91] via-[#1649a8] to-[#1e5bb8] p-6 text-white shadow-xl">
+      <div className="-mt-6 mx-1 rounded-[1.75rem] bg-gradient-to-br from-[#123c91] via-[#1649a8] to-[#1e5bb8] p-6 text-white">
         <div className="flex items-start justify-between">
           <img
             src="https://res.cloudinary.com/dflsnes44/image/upload/v1780228196/payflow_no_bg_f0l7on.png"
@@ -190,7 +190,7 @@ function QuickActions({
       <button
         type="button"
         onClick={onSend}
-        className="flex items-center justify-center gap-2 rounded-[1.25rem] bg-[#123c91] px-4 py-3.5 text-sm font-black text-white shadow-md transition-colors hover:bg-[#0d2f76]"
+        className="flex items-center justify-center gap-2 rounded-[1.25rem] bg-[#123c91] px-4 py-3.5 text-sm font-black text-white transition-colors hover:bg-[#0d2f76]"
       >
         <SendIcon />
         Send
@@ -198,7 +198,7 @@ function QuickActions({
       <button
         type="button"
         onClick={onTopUp}
-        className="flex items-center justify-center gap-2 rounded-[1.25rem] bg-orange-400 px-4 py-3.5 text-sm font-black text-orange-950 shadow-md transition-colors hover:bg-orange-500"
+        className="flex items-center justify-center gap-2 rounded-[1.25rem] bg-orange-400 px-4 py-3.5 text-sm font-black text-orange-950 transition-colors hover:bg-orange-500"
       >
         <PlusIcon />
         Top up
@@ -206,7 +206,7 @@ function QuickActions({
       <button
         type="button"
         onClick={onActivity}
-        className="grid h-[52px] w-[52px] place-items-center rounded-[1.25rem] bg-white text-slate-800 shadow-md"
+        className="grid h-[52px] w-[52px] place-items-center rounded-[1.25rem] bg-white text-slate-800"
         aria-label="More actions"
       >
         <div className="grid grid-cols-2 gap-1">
@@ -218,7 +218,7 @@ function QuickActions({
       <button
         type="button"
         onClick={onWithdraw}
-        className="col-span-3 flex items-center justify-center gap-2 rounded-[1.25rem] border-2 border-white bg-white/60 px-4 py-3 text-sm font-bold text-[#123c91] shadow-sm backdrop-blur-sm"
+        className="col-span-3 flex items-center justify-center gap-2 rounded-[1.25rem] border-2 border-white bg-white px-4 py-3 text-sm font-bold text-[#123c91]"
       >
         <ArrowDownIcon />
         Withdraw cash
@@ -236,7 +236,7 @@ function BottomNav({ tab, onTabChange }: { tab: Tab; onTabChange: (tab: Tab) => 
   ];
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-blue-100 bg-white/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-md">
+    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
       <div className="mx-auto flex max-w-lg items-center justify-around">
         {items.map((item) => {
           const active = tab === item.id;
@@ -618,7 +618,7 @@ export function CustomerAppView() {
               </div>
               <button
                 type="button"
-                className="relative grid h-11 w-11 place-items-center rounded-full bg-white text-[#123c91] shadow-md"
+                className="relative grid h-11 w-11 place-items-center rounded-full bg-white text-[#123c91]"
                 aria-label={`${data.pendingCount} pending notifications`}
               >
                 <BellIcon />
@@ -664,7 +664,7 @@ export function CustomerAppView() {
               </p>
             </header>
 
-            <form onSubmit={handleSend} className="space-y-4 rounded-[1.75rem] bg-white p-5 shadow-md">
+            <form onSubmit={handleSend} className="space-y-4 rounded-[1.75rem] border border-slate-200 bg-white p-5">
               <Field label="Recipient phone or wallet ID">
                 <input
                   className={inputClass}
@@ -696,7 +696,7 @@ export function CustomerAppView() {
               </Field>
               <button
                 type="submit"
-                className="h-12 w-full rounded-full bg-[#123c91] text-sm font-black text-white shadow-md hover:bg-[#0d2f76]"
+                className="h-12 w-full rounded-full bg-[#123c91] text-sm font-black text-white hover:bg-[#0d2f76]"
               >
                 Send now
               </button>
@@ -711,7 +711,7 @@ export function CustomerAppView() {
               <p className="mt-1 text-sm text-slate-600">Add money via mobile money or at a Payflow agent.</p>
             </header>
 
-            <form onSubmit={handleTopUp} className="space-y-4 rounded-[1.75rem] bg-white p-5 shadow-md">
+            <form onSubmit={handleTopUp} className="space-y-4 rounded-[1.75rem] border border-slate-200 bg-white p-5">
               <Field label="Amount (GMD)">
                 <input
                   className={inputClass}
@@ -746,7 +746,7 @@ export function CustomerAppView() {
               ) : null}
               <button
                 type="submit"
-                className="h-12 w-full rounded-full bg-orange-500 text-sm font-black text-white shadow-md hover:bg-orange-600"
+                className="h-12 w-full rounded-full bg-orange-500 text-sm font-black text-white hover:bg-orange-600"
               >
                 {topUpForm.method === "agent" ? "Generate agent QR" : "Pay with mobile money"}
               </button>
@@ -771,7 +771,7 @@ export function CustomerAppView() {
               </p>
             </header>
 
-            <form onSubmit={handleWithdraw} className="space-y-4 rounded-[1.75rem] bg-white p-5 shadow-md">
+            <form onSubmit={handleWithdraw} className="space-y-4 rounded-[1.75rem] border border-slate-200 bg-white p-5">
               <Field label="Amount (GMD)">
                 <input
                   className={inputClass}
@@ -796,7 +796,7 @@ export function CustomerAppView() {
               </Field>
               <button
                 type="submit"
-                className="h-12 w-full rounded-full bg-[#123c91] text-sm font-black text-white shadow-md hover:bg-[#0d2f76]"
+                className="h-12 w-full rounded-full bg-[#123c91] text-sm font-black text-white hover:bg-[#0d2f76]"
               >
                 Request withdrawal
               </button>
@@ -839,7 +839,7 @@ export function CustomerAppView() {
               </span>
             </header>
 
-            <div className="rounded-[1.75rem] bg-white p-5 shadow-md">
+            <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5">
               <h2 className="text-sm font-black text-slate-900">Wallet limits</h2>
               <dl className="mt-4 space-y-3 text-sm">
                 <div className="flex justify-between">
@@ -861,7 +861,7 @@ export function CustomerAppView() {
               <button
                 type="button"
                 onClick={() => setTab("topup")}
-                className="flex w-full items-center justify-between rounded-2xl bg-white px-4 py-3.5 text-sm font-bold shadow-sm"
+                className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-bold"
               >
                 Top up wallet
                 <span className="text-slate-400">→</span>
@@ -869,7 +869,7 @@ export function CustomerAppView() {
               <button
                 type="button"
                 onClick={() => setTab("withdraw")}
-                className="flex w-full items-center justify-between rounded-2xl bg-white px-4 py-3.5 text-sm font-bold shadow-sm"
+                className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-bold"
               >
                 Withdraw cash
                 <span className="text-slate-400">→</span>

@@ -19,7 +19,7 @@ export function AgentQrPreview({
       <p className="text-sm font-bold text-slate-900">{title}</p>
       {hint ? <p className="mt-1 text-xs text-slate-600">{hint}</p> : null}
       <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-start">
-        <div className="rounded-2xl bg-white p-4 shadow-md">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4">
           <QRCode value={value} size={168} level="M" />
         </div>
         <dl className="min-w-0 flex-1 space-y-2 text-sm">

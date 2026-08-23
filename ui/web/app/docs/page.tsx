@@ -14,7 +14,7 @@ export default function DocsPage() {
     <DocsShell>
       <div className="mx-auto max-w-4xl space-y-16">
         <section id="introduction" className="scroll-mt-24">
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
             <div className="border-b border-slate-200 bg-gradient-to-br from-[#123c91] to-[#0a2558] px-8 py-10 text-white lg:px-10">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-blue-200">Developer docs</p>
               <h1 className="mt-3 max-w-2xl text-4xl font-black leading-tight tracking-tight lg:text-5xl">
@@ -47,7 +47,7 @@ export default function DocsPage() {
             </div>
           </div>
 
-          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-8">
             <SectionHeading
               title="How it works"
               description="Your server talks to Payflow. Your customer pays on our checkout page. Your server gets notified when money arrives."
@@ -64,7 +64,7 @@ export default function DocsPage() {
           </div>
         </section>
 
-        <section id="api-keys" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm lg:p-10">
+        <section id="api-keys" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-8 lg:p-10">
           <SectionHeading
             eyebrow="Authentication"
             title="API keys"
@@ -92,7 +92,7 @@ Content-Type: application/json`}
           </div>
         </section>
 
-        <section id="quickstart" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm lg:p-10">
+        <section id="quickstart" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-8 lg:p-10">
           <SectionHeading
             eyebrow="Quickstart"
             title="Create your first payment"
@@ -113,7 +113,7 @@ Content-Type: application/json`}
           </div>
         </section>
 
-        <section id="webhooks" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm lg:p-10">
+        <section id="webhooks" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-8 lg:p-10">
           <SectionHeading
             title="Webhooks"
             description="Register an endpoint in the developer dashboard. Payflow POSTs events when payment status changes."
@@ -141,7 +141,7 @@ Content-Type: application/json`}
           </div>
         </section>
 
-        <section id="errors" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm lg:p-10">
+        <section id="errors" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-8 lg:p-10">
           <SectionHeading title="Errors" description="Common responses when integrating payments." />
 
           <div className="overflow-hidden rounded-xl border border-slate-200">

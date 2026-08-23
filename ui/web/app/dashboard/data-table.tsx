@@ -113,15 +113,15 @@ export function DataTable<T extends Record<string, unknown>>({
         </table>
       </div>
       {totalPages > 1 ? (
-        <div className="mt-4 flex items-center justify-between bg-slate-100 px-3 py-4 rounded-2xl">
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-slate-100 px-3 py-3 sm:py-4">
           <p className="text-xs font-semibold text-slate-500">
             Page {safePage} of {totalPages}
           </p>
           <div className="flex gap-2">
-            <button type="button" disabled={safePage <= 1} onClick={() => setPage((p) => p - 1)} className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-800 shadow-sm disabled:cursor-not-allowed disabled:bg-slate-300">
+            <button type="button" disabled={safePage <= 1} onClick={() => setPage((p) => p - 1)} className="min-h-11 min-w-11 rounded-full bg-white px-4 py-2 text-xs font-bold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300">
               Previous
             </button>
-            <button type="button" disabled={safePage >= totalPages} onClick={() => setPage((p) => p + 1)} className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-800 shadow-sm disabled:cursor-not-allowed disabled:bg-slate-300">
+            <button type="button" disabled={safePage >= totalPages} onClick={() => setPage((p) => p + 1)} className="min-h-11 min-w-11 rounded-full bg-white px-4 py-2 text-xs font-bold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300">
               Next
             </button>
           </div>

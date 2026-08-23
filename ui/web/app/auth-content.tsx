@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { authApi, type RegisterRole } from "../lib/auth-api";
+import { authApi } from "../lib/auth-api";
 import { getDashboardPath, mapBackendRole, saveAuthSession } from "../lib/auth-session";
 import { authenticateDemoUser, DEMO_AUTH_ENABLED, getDemoDashboardPath, saveDemoSession } from "../lib/demo-auth";
 import { DEMO_PASSWORD, demoUsers } from "../lib/mock/demo-users";
 import { toE164Phone } from "../lib/merchant-registration";
 import { AuthField, AuthShell, DividerText, SocialButton } from "./auth-shell";
+
+const webDemoUsers = demoUsers.filter((user) => user.role === "admin" || user.role === "developer");
 
 function MailIcon() {
   return (
@@ -50,24 +52,25 @@ function FacebookIcon() {
 
 function DemoAccountsPanel({ onSelect }: { onSelect: (email: string) => void }) {
   return (
-    <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-4 text-sm text-blue-950">
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-900 sm:px-4 sm:py-4">
       <p className="font-bold">Demo logins</p>
-      <p className="mt-1 text-blue-900">
-        Password for all accounts: <code className="rounded bg-white/70 px-1.5 py-0.5 text-xs">{DEMO_PASSWORD}</code>
+      <p className="mt-1 text-xs text-slate-600 sm:text-sm">
+        Web access is for developers and admins. Password:{" "}
+        <code className="rounded bg-white px-1.5 py-0.5 text-xs">{DEMO_PASSWORD}</code>
       </p>
-      <div className="mt-3 space-y-2">
-        {demoUsers.map((user) => (
+      <div className="mt-3 grid gap-2">
+        {webDemoUsers.map((user) => (
           <button
             key={user.email}
             type="button"
             onClick={() => onSelect(user.email)}
-            className="flex w-full items-center justify-between rounded-xl border border-blue-200 bg-white px-3 py-2 text-left transition-colors hover:bg-blue-100/40"
+            className="flex w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left transition-colors hover:bg-slate-100"
           >
-            <span>
+            <span className="min-w-0">
               <span className="block font-semibold capitalize text-slate-900">{user.role}</span>
-              <span className="text-xs text-slate-600">{user.email}</span>
+              <span className="block truncate text-xs text-slate-600">{user.email}</span>
             </span>
-            <span className="text-xs font-bold uppercase tracking-wide text-[#123c91]">Use</span>
+            <span className="shrink-0 text-xs font-bold uppercase tracking-wide text-[#123c91]">Use</span>
           </button>
         ))}
       </div>
@@ -84,7 +87,6 @@ export function CombinedAuthPage({ initialMode = "login" }: { initialMode?: "log
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [signupRole, setSignupRole] = useState<RegisterRole>("DEVELOPER");
   const [signup, setSignup] = useState({
     firstName: "",
     lastName: "",
@@ -104,6 +106,10 @@ export function CombinedAuthPage({ initialMode = "login" }: { initialMode?: "log
       if (DEMO_AUTH_ENABLED) {
         const demoUser = authenticateDemoUser(email, password);
         if (demoUser) {
+          if (demoUser.role !== "admin" && demoUser.role !== "developer") {
+            setError("Web login is for developer and admin accounts. Use the mobile apps for customer or merchant access.");
+            return;
+          }
           saveDemoSession(demoUser);
           window.location.href = getDemoDashboardPath(demoUser.role);
           return;
@@ -111,6 +117,11 @@ export function CombinedAuthPage({ initialMode = "login" }: { initialMode?: "log
       }
 
       const auth = await authApi.login(email.trim(), password);
+      const role = mapBackendRole(auth.role);
+      if (role !== "admin" && role !== "developer") {
+        setError("Web login is for developer and admin accounts. Use the mobile apps for customer or merchant access.");
+        return;
+      }
       saveAuthSession({
         username: auth.username,
         role: auth.role,
@@ -118,7 +129,7 @@ export function CombinedAuthPage({ initialMode = "login" }: { initialMode?: "log
         refreshToken: auth.refreshToken,
         userStatus: auth.userStatus,
       });
-      window.location.href = getDashboardPath(mapBackendRole(auth.role));
+      window.location.href = getDashboardPath(role);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -143,7 +154,7 @@ export function CombinedAuthPage({ initialMode = "login" }: { initialMode?: "log
         phoneNumber: toE164Phone(signup.phoneLocal),
         email: signup.email.trim(),
         password: signup.password,
-        role: signupRole,
+        role: "DEVELOPER",
       });
       saveAuthSession({
         username: signup.email.trim(),
@@ -169,10 +180,10 @@ export function CombinedAuthPage({ initialMode = "login" }: { initialMode?: "log
   }
 
   return (
-    <AuthShell heading={isLogin ? "Welcome back!" : "Create account!"}>
-      <div className="mt-6">
+    <AuthShell heading={isLogin ? "Welcome back!" : "Create developer account"}>
+      <div className="mt-5 sm:mt-6">
         {isLogin ? (
-          <form className="space-y-4" onSubmit={handleLogin}>
+          <form className="space-y-3.5 sm:space-y-4" onSubmit={handleLogin}>
             {DEMO_AUTH_ENABLED ? <DemoAccountsPanel onSelect={handleDemoSelect} /> : null}
 
             <AuthField
@@ -194,12 +205,12 @@ export function CombinedAuthPage({ initialMode = "login" }: { initialMode?: "log
 
             {error ? <p className="text-sm font-semibold text-rose-600">{error}</p> : null}
 
-            <div className="flex items-center justify-between gap-4 text-base font-semibold text-slate-700">
-              <label className="flex items-center gap-3">
-                <input type="checkbox" defaultChecked className="h-5 w-5 rounded border-slate-300 accent-[#123c91]" />
-                Remember me
+            <div className="flex items-center justify-between gap-3 text-sm font-semibold text-slate-700">
+              <label className="flex min-w-0 items-center gap-2.5">
+                <input type="checkbox" defaultChecked className="h-4 w-4 shrink-0 rounded border-slate-300 accent-[#123c91] sm:h-5 sm:w-5" />
+                <span className="truncate">Remember me</span>
               </label>
-              <a href="#" className="font-black text-[#123c91]">
+              <a href="#" className="shrink-0 font-black text-[#123c91]">
                 Forgot password?
               </a>
             </div>
@@ -207,14 +218,14 @@ export function CombinedAuthPage({ initialMode = "login" }: { initialMode?: "log
             <button
               type="submit"
               disabled={loading}
-              className="h-14 w-full rounded-full bg-[#123c91] text-base font-black text-white shadow-sm transition-colors hover:bg-[#0d2f76] disabled:opacity-60"
+              className="h-12 w-full rounded-2xl bg-[#123c91] text-base font-black text-white transition-colors hover:bg-[#0d2f76] disabled:opacity-60 sm:h-14 sm:rounded-full"
             >
               {loading ? "Signing in…" : "Login"}
             </button>
 
             <DividerText>or continue with</DividerText>
 
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+            <div className="grid grid-cols-2 gap-3">
               <SocialButton label="Google">
                 <GoogleIcon />
               </SocialButton>
@@ -224,36 +235,20 @@ export function CombinedAuthPage({ initialMode = "login" }: { initialMode?: "log
             </div>
           </form>
         ) : (
-          <form className="space-y-4" onSubmit={handleSignup}>
-            <p className="text-sm text-slate-600">
-              {signupRole === "DEVELOPER"
-                ? "Create a developer account to get API keys and accept payments in your app."
-                : "Create a personal Payflow account for wallet and payments."}
+          <form className="space-y-3.5 sm:space-y-4" onSubmit={handleSignup}>
+            <p className="text-sm leading-relaxed text-slate-600">
+              Web signup is for developers. Create an account to get API keys, accept payments from your backend, and manage webhooks.
             </p>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="block">
-                <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">Account type</span>
-                <select
-                  className={inputClass}
-                  value={signupRole}
-                  onChange={(e) => setSignupRole(e.target.value as RegisterRole)}
-                >
-                  <option value="DEVELOPER">Developer</option>
-                  <option value="USER">Personal account</option>
-                </select>
-              </label>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <input className={inputClass} placeholder="First name" value={signup.firstName} onChange={(e) => setSignup({ ...signup, firstName: e.target.value })} required />
               <input className={inputClass} placeholder="Last name" value={signup.lastName} onChange={(e) => setSignup({ ...signup, lastName: e.target.value })} required />
             </div>
 
             <div className="flex overflow-hidden rounded-2xl border border-slate-300 bg-white">
-              <span className="flex items-center bg-slate-100 px-4 text-sm font-bold text-slate-600">+220</span>
+              <span className="flex items-center bg-slate-100 px-3 text-sm font-bold text-slate-600 sm:px-4">+220</span>
               <input
-                className="h-12 flex-1 px-4 text-sm font-semibold outline-none"
+                className="h-12 min-w-0 flex-1 px-3 text-base font-semibold outline-none sm:px-4 sm:text-sm"
                 placeholder="712 3456"
                 inputMode="numeric"
                 value={signup.phoneLocal}
@@ -292,23 +287,22 @@ export function CombinedAuthPage({ initialMode = "login" }: { initialMode?: "log
             <button
               type="submit"
               disabled={loading}
-              className="h-14 w-full rounded-full bg-[#123c91] text-base font-black text-white shadow-sm transition-colors hover:bg-[#0d2f76] disabled:opacity-60"
+              className="h-12 w-full rounded-2xl bg-[#123c91] text-base font-black text-white transition-colors hover:bg-[#0d2f76] disabled:opacity-60 sm:h-14 sm:rounded-full"
             >
-              {loading ? "Creating account…" : signupRole === "DEVELOPER" ? "Create developer account" : "Create account"}
+              {loading ? "Creating account…" : "Create developer account"}
             </button>
 
-            <p className="text-center text-xs text-slate-500">
-              Running a business in The Gambia?{" "}
+            <p className="text-center text-xs leading-relaxed text-slate-500">
+              Customers and merchants register in the Payflow mobile apps.{" "}
               <Link href="/merchants/register" className="font-bold text-[#123c91]">
-                Register as a merchant
-              </Link>{" "}
-              in the Payflow Merchant app.
+                Merchant app info
+              </Link>
             </p>
           </form>
         )}
 
-        <p className="mt-4 text-center text-base text-slate-700">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+        <p className="mt-5 text-center text-sm text-slate-700 sm:mt-4 sm:text-base">
+          {isLogin ? "Need a developer account?" : "Already have an account?"}{" "}
           <button type="button" onClick={() => setMode(isLogin ? "signup" : "login")} className="font-black text-[#123c91]">
             {isLogin ? "Sign up" : "Login"}
           </button>

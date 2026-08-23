@@ -4,12 +4,13 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   html,
   body {
     @apply min-h-screen bg-slate-50 font-sans text-slate-900;
+    overflow-x: clip;
   }
 
   a {
@@ -26,7 +27,7 @@
   .panel,
   .card,
   .developer {
-    @apply border border-light bg-card backdrop-blur-sm shadow-2xl;
+    @apply border border-light bg-card;
   }
 
 }
@@ -47,6 +48,16 @@
 
 .app-marquee-track:hover {
   animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-marquee-track {
+    animation: none;
+  }
+
+  .payflow-loader-dot {
+    animation: none;
+  }
 }
 
 @keyframes payflow-loader-dot {
@@ -76,9 +87,6 @@
 .developer {
   border: 1px solid var(--border);
   background: var(--card);
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
 }
 
 .hero {
@@ -164,7 +172,7 @@
 }
 
 .panel.accent {
-  background: linear-gradient(180deg, rgba(249, 115, 22, 0.18), rgba(13, 27, 48, 0.95));
+  background: linear-gradient(180deg, rgba(222, 187, 48, 0.18), rgba(13, 27, 48, 0.95));
 }
 
 .developer {

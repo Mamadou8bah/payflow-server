@@ -39,7 +39,7 @@ async function post<T>(path: string, body: unknown): Promise<T> {
   return payload.data;
 }
 
-export type RegisterRole = "DEVELOPER" | "USER";
+export type RegisterRole = "DEVELOPER";
 
 export const authApi = {
   register: (payload: {

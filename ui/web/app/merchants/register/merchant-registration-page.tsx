@@ -15,11 +15,11 @@ npm install
 npm start`}</pre>
         </div>
         <p className="text-xs text-slate-500">
-          Developers and personal accounts can register on the web.
+          Web registration is for developers. Admins sign in with an existing account.
         </p>
         <Link
           href="/signup"
-          className="inline-flex h-14 w-full items-center justify-center rounded-full bg-[#123c91] text-base font-black text-white shadow-sm transition-colors hover:bg-[#0d2f76]"
+          className="inline-flex h-14 w-full items-center justify-center rounded-full bg-[#123c91] text-base font-black text-white transition-colors hover:bg-[#0d2f76]"
         >
           Create a developer account
         </Link>

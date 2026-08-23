@@ -25,7 +25,7 @@ export function DashboardShell({
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
         <div className="mx-auto flex w-[min(1440px,calc(100%-2rem))] items-center gap-4 px-4 py-4 lg:px-6">
           <a href="/" className="flex items-center gap-3">
             <img

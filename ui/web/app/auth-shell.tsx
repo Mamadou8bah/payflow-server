@@ -14,26 +14,26 @@ export function AuthShell({
   footerLinkHref,
 }: AuthShellProps) {
   return (
-    <main className="min-h-screen bg-[#eaf0ff] px-4 py-6 text-slate-900 sm:px-6 lg:px-10">
-      <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-[100rem] items-center justify-center">
-        <div className="grid w-full max-w-[76rem] overflow-hidden rounded-[2.5rem] border border-slate-300 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.10)] lg:grid-cols-[0.98fr_1fr]">
-          <section className="flex flex-col bg-white px-6 py-6 sm:px-10 lg:px-12">
-            <a href="/" className="mx-auto flex items-center gap-3">
+    <main className="min-h-screen overflow-x-clip bg-[#eaf0ff] text-slate-900">
+      <div className="mx-auto flex min-h-screen w-full max-w-[100rem] items-stretch justify-center lg:items-center lg:px-10 lg:py-8">
+        <div className="grid w-full max-w-[76rem] bg-white lg:overflow-hidden lg:rounded-[2rem] lg:border lg:border-slate-200 lg:grid-cols-[0.98fr_1fr]">
+          <section className="flex w-full flex-col px-4 pb-8 pt-5 sm:px-8 sm:pb-10 sm:pt-8 lg:px-12 lg:py-10">
+            <a href="/" className="flex shrink-0 items-center gap-2.5 sm:mx-auto sm:gap-3">
               <img
                 src="https://res.cloudinary.com/dflsnes44/image/upload/v1780228196/payflow_no_bg_f0l7on.png"
                 alt="Payflow"
-                className="h-12 w-12 object-contain"
+                className="h-9 w-9 object-contain sm:h-12 sm:w-12"
               />
-              <span className="text-3xl font-black tracking-[-0.04em] text-[#123c91]">Payflow</span>
+              <span className="text-xl font-black tracking-[-0.04em] text-[#123c91] sm:text-3xl">Payflow</span>
             </a>
 
-            <div className="mx-auto mt-8 w-full max-w-[29rem]">
-              <h1 className="text-center text-2xl font-black text-slate-800">{heading}</h1>
+            <div className="mx-auto mt-6 w-full max-w-[29rem] sm:mt-8">
+              <h1 className="text-left text-2xl font-black text-slate-900 sm:text-center sm:text-2xl">{heading}</h1>
               {children}
             </div>
 
             {footerText && footerLinkHref && footerLinkLabel ? (
-              <p className="mt-auto pt-12 text-center text-base text-slate-700">
+              <p className="mx-auto mt-8 w-full max-w-[29rem] text-center text-sm text-slate-700 sm:mt-auto sm:pt-10 sm:text-base">
                 {footerText}{" "}
                 <a href={footerLinkHref} className="font-black text-[#123c91]">
                   {footerLinkLabel}
@@ -78,9 +78,9 @@ export function AuthField({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="h-12 w-full rounded-full border border-slate-300 bg-white px-5 pr-12 text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-500 focus:border-[#123c91] focus:ring-4 focus:ring-blue-100"
+        className="h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 pr-12 text-base font-semibold text-slate-900 outline-none placeholder:text-slate-500 focus:border-[#123c91] focus:ring-4 focus:ring-blue-100 sm:h-12 sm:rounded-full sm:px-5 sm:text-sm"
       />
-      <span className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500">{icon}</span>
+      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 sm:right-5">{icon}</span>
     </label>
   );
 }
@@ -105,7 +105,7 @@ export function SocialButton({
   return (
     <button
       type="button"
-      className="flex h-11 items-center justify-center gap-3 rounded-full border border-slate-200 bg-white px-5 text-sm font-bold text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
+      className="flex h-12 w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 sm:h-11 sm:rounded-full"
     >
       {children}
       {label}

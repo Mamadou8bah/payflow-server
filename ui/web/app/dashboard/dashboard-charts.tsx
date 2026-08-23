@@ -4,7 +4,7 @@ import { useId } from "react";
 
 export type ChartPoint = { label: string; value: number };
 
-const CHART_COLORS = ["#123c91", "#f97316", "#10b981", "#8b5cf6", "#ef4444", "#0ea5e9"];
+const CHART_COLORS = ["#123c91", "#debb30", "#10b981", "#8b5cf6", "#ef4444", "#0ea5e9"];
 const PAYFLOW_LOGO = "https://res.cloudinary.com/dflsnes44/image/upload/v1780228196/payflow_no_bg_f0l7on.png";
 
 function ChartFrame({ height, children }: { height: number; children: React.ReactNode }) {
@@ -188,7 +188,7 @@ export function DonutChart({
   );
 }
 
-export function Sparkline({ values, color = "#f97316" }: { values: number[]; color?: string }) {
+export function Sparkline({ values, color = "#debb30" }: { values: number[]; color?: string }) {
   const max = Math.max(...values, 1);
   const w = 80;
   const h = 28;
@@ -224,7 +224,7 @@ export function DashboardHeroCard({
   progressLabel?: string;
 }) {
   return (
-    <section className="overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#123c91] via-[#1649a8] to-[#1e5bb8] p-6 text-white shadow-lg">
+    <section className="overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#123c91] via-[#1649a8] to-[#1e5bb8] p-6 text-white">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-white">{label}</p>

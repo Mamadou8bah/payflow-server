@@ -38,7 +38,7 @@ export function PayflowLoader({
 export function DashboardLoadingSkeleton() {
   return (
     <main className="min-h-screen bg-[#eaf0ff] text-slate-900">
-      <header className="bg-white shadow-md">
+      <header className="bg-white">
         <div className="mx-auto flex w-[min(1440px,calc(100%-1.5rem))] items-center gap-4 px-3 py-3 lg:px-5">
           <div className="h-9 w-9 shrink-0 animate-pulse rounded-xl bg-slate-200" />
           <div className="mx-auto flex gap-2">
@@ -51,16 +51,16 @@ export function DashboardLoadingSkeleton() {
       </header>
 
       <div className="mx-auto w-[min(1440px,calc(100%-1.5rem))] space-y-5 px-3 py-6 lg:px-5">
-        <div className="h-10 w-full max-w-md animate-pulse rounded-2xl bg-white shadow-md" />
+        <div className="h-10 w-full max-w-md animate-pulse rounded-2xl bg-white" />
         <div className="grid gap-5 lg:grid-cols-2">
-          <div className="h-48 animate-pulse rounded-[1.75rem] bg-white shadow-md" />
-          <div className="h-48 animate-pulse rounded-[1.75rem] bg-white shadow-md" />
+          <div className="h-48 animate-pulse rounded-[1.75rem] bg-white" />
+          <div className="h-48 animate-pulse rounded-[1.75rem] bg-white" />
         </div>
-        <div className="h-64 animate-pulse rounded-[1.75rem] bg-white shadow-md" />
+        <div className="h-64 animate-pulse rounded-[1.75rem] bg-white" />
       </div>
 
       <div className="pointer-events-none fixed inset-0 flex items-center justify-center bg-[#eaf0ff]/40">
-        <div className="flex flex-col items-center gap-4 rounded-[1.75rem] bg-white px-8 py-6 shadow-md">
+        <div className="flex flex-col items-center gap-4 rounded-[1.75rem] bg-white px-8 py-6">
           <div className="relative h-10 w-10" aria-hidden="true">
             <span className="absolute inset-0 rounded-full border-2 border-slate-200" />
             <span className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-[#123c91]" />

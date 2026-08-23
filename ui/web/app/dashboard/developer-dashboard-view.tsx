@@ -31,7 +31,7 @@ function IntegrationSteps() {
   return (
     <div className="grid gap-4 lg:grid-cols-3">
       {steps.map((step) => (
-        <div key={step.n} className="rounded-2xl bg-white p-5 shadow-md">
+        <div key={step.n} className="rounded-2xl border border-slate-200 bg-white p-5">
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#123c91] text-sm font-black text-white">{step.n}</span>
           <h3 className="mt-3 font-bold text-slate-950">{step.title}</h3>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">{step.body}</p>
@@ -137,7 +137,7 @@ export function DeveloperDashboardView() {
 
           <div className="grid gap-4 sm:grid-cols-3">
             {data.stats.map((stat) => (
-              <div key={stat.label} className="rounded-2xl bg-white p-5 shadow-md">
+              <div key={stat.label} className="rounded-2xl border border-slate-200 bg-white p-5">
                 <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{stat.label}</p>
                 <p className="mt-2 text-2xl font-black text-slate-950">{stat.value}</p>
                 <p className="mt-1 text-xs text-slate-500">{stat.hint}</p>

@@ -51,7 +51,7 @@ export function CodeBlock({ title, code }: { title: string; code: string }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl bg-slate-950 shadow-md">
+    <div className="overflow-hidden rounded-xl bg-slate-950">
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-2.5">
         <span className="text-xs font-semibold text-slate-400">{title}</span>
         <button
@@ -71,7 +71,7 @@ export function CodeBlock({ title, code }: { title: string; code: string }) {
 
 export function EndpointTable({ endpoints }: { endpoints: EndpointDoc[] }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
       <div className="hidden grid-cols-[5.5rem_1fr_1.2fr] gap-4 border-b border-slate-200 bg-slate-50 px-5 py-3 text-xs font-bold uppercase tracking-wide text-slate-500 md:grid">
         <span>Method</span>
         <span>Endpoint</span>
@@ -123,7 +123,7 @@ export function FeatureGrid({
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {items.map((item) => (
-        <div key={item.label} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div key={item.label} className="rounded-xl border border-slate-200 bg-white p-5">
           <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{item.label}</p>
           <p className="mt-2 text-xl font-black text-slate-950">{item.value}</p>
           <p className="mt-1 text-sm text-slate-600">{item.hint}</p>

@@ -14,13 +14,16 @@ import com.mamadou.payflow.wallet.enums.WalletStatus;
 import com.mamadou.payflow.wallet.exception.WalletNotFoundException;
 import com.mamadou.payflow.wallet.exception.WalletOperationException;
 import com.mamadou.payflow.wallet.repository.WalletRepository;
+import com.mamadou.payflow.fraud.service.FraudDetectionService;
 import com.mamadou.payflow.wallet.service.WalletLimitService;
+import com.mamadou.payflow.wallet.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,11 +34,15 @@ public class TransferValidationService {
     private final LedgerBalanceComputationService ledgerBalanceComputationService;
     private final TransferRequestValidator transferRequestValidator;
     private final UserRepository userRepository;
+    private final WalletService walletService;
+    private final FraudDetectionService fraudDetectionService;
 
     public TransferValidationResult validateForExecution(TransferRequest request) {
         transferRequestValidator.validate(request);
         User currentUser = currentUser();
-        LockedWallets lockedWallets = lockWallets(request.getSourceWalletId(), request.getDestinationWalletId());
+        Long sourceWalletId = resolveSourceWalletId(request, currentUser);
+        request.setSourceWalletId(sourceWalletId);
+        LockedWallets lockedWallets = lockWallets(sourceWalletId, request.getDestinationWalletId());
         Wallet sourceWallet = lockedWallets.sourceWallet();
         Wallet destinationWallet = lockedWallets.destinationWallet();
         if (sourceWallet.getUser().getId() != currentUser.getId()) {
@@ -45,6 +52,17 @@ public class TransferValidationService {
         validateWallets(sourceWallet, destinationWallet);
         walletLimitService.validateDebit(sourceWallet, request.getAmount());
         ensureSufficientBalance(sourceWallet, request.getAmount());
+
+        String fraudTxnId = request.getReference() != null && !request.getReference().isBlank()
+                ? request.getReference()
+                : "xfer-" + UUID.randomUUID();
+        fraudDetectionService.checkBeforeExecution(
+                fraudTxnId,
+                currentUser,
+                sourceWallet,
+                request.getAmount(),
+                "transfer"
+        );
 
         return TransferValidationResult.builder()
                 .sourceWallet(sourceWallet)
@@ -104,6 +122,13 @@ public class TransferValidationService {
     }
 
     private record LockedWallets(Wallet sourceWallet, Wallet destinationWallet) {
+    }
+
+    private Long resolveSourceWalletId(TransferRequest request, User currentUser) {
+        if (request.getSourceWalletId() != null) {
+            return request.getSourceWalletId();
+        }
+        return walletService.resolvePrimaryWallet(currentUser.getId(), null).getId();
     }
 
     private User currentUser() {

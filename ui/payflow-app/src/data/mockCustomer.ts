@@ -1,0 +1,137 @@
+import type { CustomerDashboardData, StatCategory } from "../types";
+
+export const mockCustomerDashboard: CustomerDashboardData = {
+  session: {
+    name: "Fatou Jallow",
+    phone: "+220 712 3456",
+    email: "fatou@payflow.local",
+    address: "12 Kairaba Avenue, Serrekunda",
+  },
+  wallets: [
+    {
+      id: 6544,
+      name: "Main wallet",
+      currency: "GMD",
+      balance: 52806.99,
+      status: "ACTIVE",
+      dailyLimit: 100000,
+      dailyUsed: 12400,
+      kind: "primary",
+    },
+    {
+      id: 6545,
+      name: "Savings wallet",
+      currency: "GMD",
+      balance: 18500,
+      status: "ACTIVE",
+      dailyLimit: 50000,
+      dailyUsed: 0,
+      kind: "savings",
+    },
+    {
+      id: 6546,
+      name: "USD wallet",
+      currency: "USD",
+      balance: 320.5,
+      status: "ACTIVE",
+      dailyLimit: 5000,
+      dailyUsed: 45,
+      kind: "secondary",
+    },
+  ],
+  pendingCount: 2,
+  contacts: [
+    { id: "c1", name: "Lamin S.", phone: "+220 711 2233", color: "#123c91" },
+    { id: "c2", name: "Awa C.", phone: "+220 765 8899", color: "#f97316" },
+    { id: "c3", name: "Omar B.", phone: "+220 778 4412", color: "#047857" },
+    { id: "c4", name: "Mariama T.", phone: "+220 701 5566", color: "#7c3aed" },
+    { id: "c5", name: "Acme", phone: "Merchant", color: "#334155" },
+  ],
+  transactions: [
+    {
+      id: "txn_8821",
+      type: "TRANSFER_IN",
+      counterparty: "Lamin Sowe",
+      amount: 4500,
+      currency: "GMD",
+      status: "COMPLETED",
+      method: "Main wallet",
+      category: "Transfers",
+      time: "2026-06-27T10:40:00Z",
+    },
+    {
+      id: "txn_8820",
+      type: "TRANSFER_OUT",
+      counterparty: "Acme Merchant",
+      amount: 12000,
+      currency: "GMD",
+      status: "COMPLETED",
+      method: "Main wallet",
+      category: "Payments",
+      time: "2026-06-27T10:12:00Z",
+    },
+    {
+      id: "txn_8819",
+      type: "DEPOSIT",
+      counterparty: "ModemPay",
+      amount: 8000,
+      currency: "GMD",
+      status: "COMPLETED",
+      method: "Mobile money",
+      category: "Top up",
+      time: "2026-06-26T16:30:00Z",
+    },
+    {
+      id: "txn_8818",
+      type: "WITHDRAWAL",
+      counterparty: "Agent — Banjul",
+      amount: 5000,
+      currency: "GMD",
+      status: "AWAITING_AGENT",
+      method: "Cash out",
+      category: "Withdrawals",
+      time: "2026-06-26T14:15:00Z",
+    },
+    {
+      id: "txn_8817",
+      type: "TRANSFER_OUT",
+      counterparty: "Awa Camara",
+      amount: 2250,
+      currency: "GMD",
+      status: "COMPLETED",
+      method: "Main wallet",
+      category: "Transfers",
+      time: "2026-06-26T09:58:00Z",
+    },
+    {
+      id: "txn_8816",
+      type: "DEPOSIT",
+      counterparty: "Agent — Serrekunda",
+      amount: 15000,
+      currency: "GMD",
+      status: "COMPLETED",
+      method: "Agent cash-in",
+      category: "Top up",
+      time: "2026-06-25T11:20:00Z",
+    },
+  ],
+};
+
+export const expenseCategories: StatCategory[] = [
+  { label: "Payments", amount: 14250, color: "#123c91" },
+  { label: "Transfers", amount: 6750, color: "#f97316" },
+  { label: "Withdrawals", amount: 5000, color: "#64748b" },
+  { label: "Fees", amount: 120, color: "#cbd5e1" },
+];
+
+export const incomeCategories: StatCategory[] = [
+  { label: "Deposits", amount: 23000, color: "#047857" },
+  { label: "Received", amount: 4500, color: "#123c91" },
+  { label: "Refunds", amount: 800, color: "#f97316" },
+];
+
+export const supportMessages = [
+  { id: "m1", from: "agent" as const, text: "Hello Fatou! How can we help you today?", time: "10:02" },
+  { id: "m2", from: "user" as const, text: "I need help with a pending withdrawal.", time: "10:03" },
+  { id: "m3", from: "agent" as const, text: "Sure — please share your withdrawal reference and we'll check the agent queue.", time: "10:04" },
+];

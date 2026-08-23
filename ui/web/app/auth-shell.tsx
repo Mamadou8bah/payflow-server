@@ -17,7 +17,7 @@ export function AuthShell({
     <main className="min-h-screen bg-[#eaf0ff] px-4 py-6 text-slate-900 sm:px-6 lg:px-10">
       <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-[100rem] items-center justify-center">
         <div className="grid w-full max-w-[76rem] overflow-hidden rounded-[2.5rem] border border-slate-300 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.10)] lg:grid-cols-[0.98fr_1fr]">
-          <section className="flex min-h-[42rem] flex-col bg-white px-6 py-8 sm:px-10 lg:px-12">
+          <section className="flex flex-col bg-white px-6 py-6 sm:px-10 lg:px-12">
             <a href="/" className="mx-auto flex items-center gap-3">
               <img
                 src="https://res.cloudinary.com/dflsnes44/image/upload/v1780228196/payflow_no_bg_f0l7on.png"
@@ -27,7 +27,7 @@ export function AuthShell({
               <span className="text-3xl font-black tracking-[-0.04em] text-[#123c91]">Payflow</span>
             </a>
 
-            <div className="mx-auto mt-14 w-full max-w-[29rem]">
+            <div className="mx-auto mt-8 w-full max-w-[29rem]">
               <h1 className="text-center text-2xl font-black text-slate-800">{heading}</h1>
               {children}
             </div>
@@ -42,7 +42,7 @@ export function AuthShell({
             ) : null}
           </section>
 
-          <section className="hidden min-h-[42rem] overflow-hidden bg-slate-200 lg:block">
+          <section className="hidden overflow-hidden bg-slate-200 lg:block">
             <img
               src="https://res.cloudinary.com/dflsnes44/image/upload/v1780245250/lp_pwrrme.jpg"
               alt="Payflow visual"
@@ -59,15 +59,24 @@ export function AuthField({
   type,
   placeholder,
   icon,
+  value,
+  onChange,
+  name,
 }: {
   type: string;
   placeholder: string;
   icon: React.ReactNode;
+  value?: string;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  name?: string;
 }) {
   return (
     <label className="relative block">
       <input
         type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
         placeholder={placeholder}
         className="h-12 w-full rounded-full border border-slate-300 bg-white px-5 pr-12 text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-500 focus:border-[#123c91] focus:ring-4 focus:ring-blue-100"
       />

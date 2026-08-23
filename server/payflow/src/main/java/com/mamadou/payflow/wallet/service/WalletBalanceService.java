@@ -61,7 +61,7 @@ public class WalletBalanceService {
 
     @Transactional
     public WalletTransactionResponse creditWallet(Long walletId, WalletTransactionRequest request) {
-        Wallet wallet = getOwnedWallet(walletId);
+        Wallet wallet = getWalletById(walletId);
         ensureActiveWallet(wallet);
         validateAmount(request.getAmount());
 
@@ -95,7 +95,7 @@ public class WalletBalanceService {
 
     @Transactional
     public WalletTransactionResponse debitWallet(Long walletId, WalletTransactionRequest request) {
-        Wallet wallet = getOwnedWallet(walletId);
+        Wallet wallet = getWalletById(walletId);
         ensureActiveWallet(wallet);
         validateAmount(request.getAmount());
         walletLimitService.validateDebit(wallet, request.getAmount());
@@ -145,6 +145,11 @@ public class WalletBalanceService {
 
     private Wallet getOwnedWallet(Long walletId) {
         return walletRepository.findByIdAndUserId(walletId, currentUser().getId())
+                .orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
+    }
+
+    private Wallet getWalletById(Long walletId) {
+        return walletRepository.findById(walletId)
                 .orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
     }
 

@@ -24,6 +24,7 @@ public interface WalletRepository extends JpaRepository<Wallet, Long> {
     Optional<Wallet> findWithLockByIdAndUserId(Long id, Long userId);
 
     boolean existsByUserIdAndCurrencyIgnoreCase(Long userId, String currency);
+    Optional<Wallet> findFirstByUserIdAndStatusOrderByIdAsc(Long userId, WalletStatus status);
     int countByUser(User user);
     int countByStatus(WalletStatus status);
 }

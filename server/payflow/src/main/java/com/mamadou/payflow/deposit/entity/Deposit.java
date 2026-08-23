@@ -136,9 +136,10 @@ public class Deposit extends AuditableEntity {
     }
 
     public enum DepositStatus {
-        PENDING,      // Awaiting payment
-        COMPLETED,    // Payment received and processed
-        FAILED,       // Payment failed
-        CANCELLED     // Deposit cancelled
+        AWAITING_AGENT, // Merchant intent created; agent must scan QR and complete
+        PENDING,        // Awaiting external payment
+        COMPLETED,      // Payment received and processed
+        FAILED,         // Payment failed
+        CANCELLED       // Deposit cancelled
     }
 }

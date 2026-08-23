@@ -4,6 +4,7 @@ import com.mamadou.payflow.ledger.dto.LedgerPostingRequest;
 import com.mamadou.payflow.ledger.dto.LedgerTraceResponse;
 import com.mamadou.payflow.ledger.enums.LedgerPostingSide;
 import com.mamadou.payflow.ledger.service.LedgerService;
+import com.mamadou.payflow.risk.service.RiskEngineService;
 import com.mamadou.payflow.transaction.entity.Transaction;
 import com.mamadou.payflow.transaction.service.TransactionService;
 import com.mamadou.payflow.transfer.dto.TransferRequest;
@@ -31,6 +32,7 @@ public class TransferExecutionService {
     
     @Qualifier("transferExecutor")
     private final TaskExecutor transferExecutor;
+    private final RiskEngineService riskEngineService;
 
     public Transaction execute(TransferRequest request, TransferValidationResult validationResult) {
         Wallet sourceWallet = validationResult.getSourceWallet();
@@ -52,7 +54,8 @@ public class TransferExecutionService {
             
             // Track wallet limit usage asynchronously (can be done in parallel)
             trackWalletLimitAsync(sourceWallet, request.getAmount());
-            
+            evaluateRiskAsync(sourceWallet, transaction, request.getAmount());
+
             return transactionService.markCompleted(transaction, trace.getTraceId());
         } catch (RuntimeException exception) {
             transactionService.markFailed(transaction, exception.getMessage());
@@ -90,6 +93,20 @@ public class TransferExecutionService {
                 log.debug("Wallet limit tracking completed for wallet {}", sourceWallet.getId());
             } catch (Exception e) {
                 log.error("Error tracking wallet limit for wallet {}", sourceWallet.getId(), e);
+            }
+        }, transferExecutor);
+    }
+
+    private void evaluateRiskAsync(Wallet sourceWallet, Transaction transaction, BigDecimal amount) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                riskEngineService.evaluateTransactionRisk(
+                    sourceWallet.getId(),
+                    amount,
+                    transaction.getId()
+                );
+            } catch (Exception e) {
+                log.error("Post-transfer risk evaluation failed for transaction {}", transaction.getId(), e);
             }
         }, transferExecutor);
     }

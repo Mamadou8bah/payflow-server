@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,6 +76,34 @@ public class WalletService {
     }
 
     @Transactional(readOnly = true)
+    public WalletResponse getPrimaryWallet(String currency) {
+        return mapToResponse(resolvePrimaryWallet(currentUser().getId(), currency));
+    }
+
+    @Transactional(readOnly = true)
+    public Wallet resolvePrimaryWallet(Long userId, String currency) {
+        String normalized = normalizeCurrency(currency);
+        if (normalized != null) {
+            List<Wallet> wallets = walletRepository.findByUserId(userId);
+            Optional<Wallet> match = wallets.stream()
+                    .filter(w -> w.getStatus() == WalletStatus.ACTIVE)
+                    .filter(w -> w.getCurrency().equalsIgnoreCase(normalized))
+                    .findFirst();
+            if (match.isPresent()) {
+                return match.get();
+            }
+        }
+        return walletRepository.findFirstByUserIdAndStatusOrderByIdAsc(userId, WalletStatus.ACTIVE)
+                .orElseThrow(() -> new WalletNotFoundException("No active wallet found for user"));
+    }
+
+    @Transactional(readOnly = true)
+    public Wallet getWalletForUser(Long walletId, Long userId) {
+        return walletRepository.findByIdAndUserId(walletId, userId)
+                .orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
+    }
+
+    @Transactional(readOnly = true)
     public WalletResponse getWallet(Long walletId) {
         return mapToResponse(getOwnedWallet(walletId));
     }
@@ -98,12 +127,28 @@ public class WalletService {
 
     @Transactional
     public WalletResponse unfreezeWallet(Long walletId) {
-        Wallet wallet = getOwnedWallet(walletId);
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
         if (wallet.getStatus() == WalletStatus.CLOSED) {
             throw new WalletOperationException("Closed wallets cannot be unfrozen");
         }
         wallet.setStatus(WalletStatus.ACTIVE);
         return mapToResponse(walletRepository.save(wallet));
+    }
+
+    /**
+     * Ensures the caller owns the wallet, or is an admin acting on any wallet.
+     */
+    @Transactional(readOnly = true)
+    public void assertWalletAccess(Long walletId) {
+        User user = currentUser();
+        if (com.mamadou.payflow.common.security.SecurityRoleUtils.isAdmin(user)) {
+            if (!walletRepository.existsById(walletId)) {
+                throw new WalletNotFoundException("Wallet not found");
+            }
+            return;
+        }
+        getOwnedWallet(walletId);
     }
 
     private Wallet getOwnedWallet(Long walletId) {

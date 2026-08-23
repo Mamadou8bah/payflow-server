@@ -15,7 +15,7 @@ const audienceCards = [
   },
   {
     title: "Developer integration",
-    text: "Integrate quickly with documented APIs, idempotent endpoints, webhook events, and tools built for reliable delivery.",
+    text: "Create an API key, accept payments from your backend, and confirm with webhooks.",
   },
 ];
 
@@ -118,15 +118,6 @@ const proofStats = [
   ["Merchant collections", "Payment links and webhook-driven updates"],
   ["Wallet operations", "Limits, freezing, unfreezing, and balances"],
   ["Operational control", "Risk flags, reconciliation, and audit trail"],
-];
-
-const apiItems = [
-  "POST /api/auth/login",
-  "POST /api/v1/payment-links",
-  "POST /api/v1/wallets",
-  "POST /api/v1/transfers",
-  "POST /api/v1/risk/evaluate",
-  "POST /api/v1/reconciliation/manual",
 ];
 
 const faqSections = [
@@ -339,7 +330,7 @@ const headerNavGroups = [
   {
     label: "Customers",
     links: [
-      { label: "Wallet transfers", href: "#audiences" },
+      { label: "Wallet app", href: "/app" },
       { label: "Checkout experience", href: "#audiences" },
       { label: "Transaction history", href: "/customers/transactions" },
     ],
@@ -347,7 +338,7 @@ const headerNavGroups = [
   {
     label: "Merchants",
     links: [
-      { label: "Payment links", href: "/merchants/payment-links" },
+      { label: "Payment links", href: "/signup" },
       { label: "Collections", href: "#audiences" },
       { label: "Webhook updates", href: "/merchants/webhooks" },
     ],
@@ -365,7 +356,7 @@ const headerNavGroups = [
     links: [
       { label: "Risk controls", href: "#capabilities" },
       { label: "Reconciliation", href: "/operations/reconciliation" },
-      { label: "Admin dashboard", href: "/operations/admin" },
+      { label: "Admin dashboard", href: "/dashboard" },
     ],
   },
   {
@@ -413,7 +404,7 @@ export default function HomePage() {
           </nav>
 
           <div className="flex items-center gap-3 justify-self-end">
-            <a className="rounded-full bg-orange-600 px-5 py-2 text-sm font-bold text-white" href="#cta">Get started</a>
+            <a className="rounded-full bg-orange-600 px-5 py-2 text-sm font-bold text-white" href="/signup">Get started</a>
             <a className="rounded-full border border-slate-900 px-5 py-2 text-sm font-bold text-slate-900" href="/login">LOG IN</a>
           </div>
         </div>
@@ -436,7 +427,7 @@ export default function HomePage() {
             </div>
 
             <div className="mt-9 flex flex-wrap items-center gap-4">
-              <a href="/login" className="rounded-full bg-orange-600 px-10 py-4 text-base font-bold text-white shadow-[0_14px_30px_rgba(249,115,22,0.28)]">Get started</a>
+              <a href="/signup" className="rounded-full bg-orange-600 px-10 py-4 text-base font-bold text-white shadow-[0_14px_30px_rgba(249,115,22,0.28)]">Get started</a>
               <div className="flex flex-col">
                 <p className="text-sm font-black uppercase tracking-[0.16em] text-emerald-600">Merchant-ready</p>
                 <p className="text-sm text-slate-500">Payment links, webhooks, free wallet transfers, and collections workflows</p>
@@ -601,7 +592,7 @@ export default function HomePage() {
               </div>
 
               <div className="flex flex-wrap gap-4 lg:justify-end">
-                <a className="rounded-full bg-orange-600 px-8 py-3 text-base font-black text-white transition-transform hover:-translate-y-0.5" href="/login">Get started</a>
+                <a className="rounded-full bg-orange-600 px-8 py-3 text-base font-black text-white transition-transform hover:-translate-y-0.5" href="/signup">Get started</a>
                 <a className="rounded-full border border-slate-900 px-8 py-3 text-base font-black text-slate-900 transition-colors hover:bg-slate-50" href="/docs">Developer docs</a>
               </div>
             </div>

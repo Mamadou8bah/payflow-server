@@ -70,6 +70,29 @@ public enum Role {
                     DEPOSIT_INITIATE,
                     TRANSACTION_CREATE,
                     TRANSFER_INITIATE,
+                    TRANSACTION_READ,
+                    WALLET_CREATE,
+                    WALLET_READ,
+                    WALLET_VIEW_BALANCE
+            )
+    ),
+    DEVELOPER(
+            Set.of(
+                    API_KEY_CREATE,
+                    API_KEY_REVOKE,
+                    API_KEY_VIEW,
+                    TRANSACTION_READ,
+                    WALLET_READ,
+                    WALLET_VIEW_BALANCE
+            )
+    ),
+    AGENT(
+            Set.of(
+                    DEPOSIT_INITIATE,
+                    WITHDRAWAL_INITIATE,
+                    WITHDRAWAL_APPROVE,
+                    WALLET_READ,
+                    WALLET_VIEW_BALANCE,
                     TRANSACTION_READ
             )
     );

@@ -1,9 +1,13 @@
 package com.mamadou.payflow.transfer.service;
 
+import com.mamadou.payflow.auth.service.CurrentUserService;
 import com.mamadou.payflow.common.metrics.PayFlowMetricsService;
 import com.mamadou.payflow.transaction.entity.Transaction;
+import com.mamadou.payflow.transaction.enums.TransactionType;
+import com.mamadou.payflow.transaction.repository.TransactionRepository;
 import com.mamadou.payflow.transaction.service.IdempotencyService;
 import com.mamadou.payflow.transaction.service.TransactionService;
+import com.mamadou.payflow.transfer.dto.TransferListItem;
 import com.mamadou.payflow.transfer.dto.TransferRequest;
 import com.mamadou.payflow.transfer.dto.TransferResponse;
 import com.mamadou.payflow.transfer.dto.TransferValidationResult;
@@ -12,6 +16,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +30,18 @@ public class TransferService {
     private final IdempotencyService idempotencyService;
     private final TransactionService transactionService;
     private final PayFlowMetricsService metricsService;
+    private final TransactionRepository transactionRepository;
+    private final CurrentUserService currentUserService;
+
+    @Transactional(readOnly = true)
+    public List<TransferListItem> listForCurrentUser() {
+        Long userId = currentUserService.getCurrentUserId();
+        return transactionRepository
+                .findByInitiatedByIdAndTypeOrderByCreatedAtDesc(userId, TransactionType.TRANSFER)
+                .stream()
+                .map(TransferListItem::from)
+                .collect(Collectors.toList());
+    }
 
     @Transactional
     public TransferResponse transfer(TransferRequest request, String headerIdempotencyKey) {

@@ -7,9 +7,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-payflow}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-    ports:
-      - "5432:5432"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -24,13 +22,14 @@ services:
   redis:
     image: redis:7-alpine
     container_name: payflow-redis
-    ports:
-      - "6379:6379"
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -44,25 +43,34 @@ services:
       dockerfile: Dockerfile
     container_name: payflow-app
     environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-payflow}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JPA_DDL_AUTO: ${SPRING_JPA_DDL_AUTO:-validate}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      JWT_SECRET: ${JWT_SECRET}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
       TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
       TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
       PAYFLOW_EMAIL_API_KEY: ${PAYFLOW_EMAIL_API_KEY:-}
-      MODEMPAY_WEBHOOK_SIGNING_SECRET: ${MODEMPAY_WEBHOOK_SIGNING_SECRET:-}
+      MODEMPAY_WEBHOOK_SIGNING_SECRET: ${MODEMPAY_WEBHOOK_SIGNING_SECRET:?MODEMPAY_WEBHOOK_SIGNING_SECRET is required}
+      MODEMPAY_API_KEY: ${MODEMPAY_API_KEY:?MODEMPAY_API_KEY is required}
+      MODEMPAY_PUBLIC_KEY: ${MODEMPAY_PUBLIC_KEY:-}
+      MODEMPAY_API_URL: ${MODEMPAY_API_URL:-https://api.modempay.com}
+      PAYFLOW_FRAUD_BASE_URL: http://fraud-api:8001
+      PAYFLOW_FRAUD_API_KEY: ${PAYFLOW_FRAUD_API_KEY:?PAYFLOW_FRAUD_API_KEY is required}
+      PAYFLOW_FRAUD_FAIL_OPEN: ${PAYFLOW_FRAUD_FAIL_OPEN:-false}
     ports:
       - "5000:5000"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      fraud-api:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/actuator/health"]
@@ -73,7 +81,44 @@ services:
     networks:
       - payflow-network
     restart: unless-stopped
-    logs:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  fraud-api:
+    build:
+      context: "../fraud detection system"
+      dockerfile: Dockerfile
+    container_name: payflow-fraud-api
+    environment:
+      FRAUD_REDIS_HOST: redis
+      FRAUD_REDIS_PORT: 6379
+      FRAUD_REDIS_DB: 1
+      FRAUD_REDIS_PASSWORD: ${REDIS_PASSWORD}
+      FRAUD_API_PORT: 8001
+      FRAUD_API_KEY: ${PAYFLOW_FRAUD_API_KEY}
+      FRAUD_REQUIRE_API_KEY: "true"
+      FRAUD_ALLOW_AUTO_TRAIN: "false"
+      FRAUD_POSTGRES_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-payflow}
+      FRAUD_PERSIST_SCORES: "true"
+      FRAUD_INCLUDE_FEATURES: "false"
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    networks:
+      - payflow-network
+    restart: unless-stopped
+    logging:
       driver: "json-file"
       options:
         max-size: "10m"

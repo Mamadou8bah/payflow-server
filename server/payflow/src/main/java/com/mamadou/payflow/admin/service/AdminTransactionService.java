@@ -3,17 +3,16 @@ package com.mamadou.payflow.admin.service;
 import com.mamadou.payflow.audit.entity.AuditLog;
 import com.mamadou.payflow.audit.service.AuditLogService;
 import com.mamadou.payflow.audit.service.AuditTrailBuilder;
+import com.mamadou.payflow.transaction.dto.ReversalRequest;
 import com.mamadou.payflow.transaction.entity.Transaction;
 import com.mamadou.payflow.transaction.enums.TransactionStatus;
+import com.mamadou.payflow.transaction.enums.TransactionType;
 import com.mamadou.payflow.transaction.repository.TransactionRepository;
-import com.mamadou.payflow.wallet.entity.Wallet;
-import com.mamadou.payflow.wallet.repository.WalletRepository;
+import com.mamadou.payflow.transfer.service.TransferReversalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +20,7 @@ import java.math.BigDecimal;
 public class AdminTransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final WalletRepository walletRepository;
+    private final TransferReversalService transferReversalService;
     private final AuditLogService auditLogService;
 
     @Transactional
@@ -30,19 +29,17 @@ public class AdminTransactionService {
             .orElseThrow(() -> new RuntimeException("Transaction not found: " + transactionId));
 
         TransactionStatus previousStatus = transaction.getStatus();
-        transaction.setStatus(TransactionStatus.REVERSED);
 
-        transactionRepository.save(transaction);
-        log.warn("Transaction {} reversed by admin {}: {}", transactionId, adminId, reason);
-
-        if (refundToWallet && transaction.getDestinationWallet() != null) {
-            Wallet destWallet = transaction.getDestinationWallet();
-            
-            if (destWallet != null) {
-                log.info("Refunded {} to wallet {}", transaction.getAmount(), destWallet.getId());
-                walletRepository.save(destWallet);
-            }
+        if (transaction.getType() == TransactionType.TRANSFER && refundToWallet) {
+            ReversalRequest reversalRequest = new ReversalRequest();
+            reversalRequest.setReason(reason != null ? reason : "Admin reversal");
+            transferReversalService.reverseAsAdmin(transactionId, reversalRequest);
+        } else {
+            transaction.setStatus(TransactionStatus.REVERSED);
+            transactionRepository.save(transaction);
         }
+
+        log.warn("Transaction {} reversed by admin {}: {}", transactionId, adminId, reason);
 
         AuditLog auditLog = AuditTrailBuilder.create()
             .actor(adminId, adminEmail)
@@ -52,7 +49,7 @@ public class AdminTransactionService {
             .newState(TransactionStatus.REVERSED)
             .changeDescription(reason + (refundToWallet ? " (with refund)" : ""))
             .build();
-        
+
         auditLogService.createLog(auditLog);
     }
 

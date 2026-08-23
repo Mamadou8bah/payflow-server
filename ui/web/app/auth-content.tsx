@@ -1,16 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
+import { authApi, type RegisterRole } from "../lib/auth-api";
+import { getDashboardPath, mapBackendRole, saveAuthSession } from "../lib/auth-session";
+import { authenticateDemoUser, DEMO_AUTH_ENABLED, getDemoDashboardPath, saveDemoSession } from "../lib/demo-auth";
+import { DEMO_PASSWORD, demoUsers } from "../lib/mock/demo-users";
+import { toE164Phone } from "../lib/merchant-registration";
 import { AuthField, AuthShell, DividerText, SocialButton } from "./auth-shell";
-
-function UserIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M12 12.25a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
-      <path d="M4.75 20.25a7.25 7.25 0 0 1 14.5 0" />
-    </svg>
-  );
-}
 
 function MailIcon() {
   return (
@@ -51,17 +48,151 @@ function FacebookIcon() {
   );
 }
 
-export function CombinedAuthPage() {
-  const [mode, setMode] = useState<"login" | "signup">("login");
+function DemoAccountsPanel({ onSelect }: { onSelect: (email: string) => void }) {
+  return (
+    <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-4 text-sm text-blue-950">
+      <p className="font-bold">Demo logins</p>
+      <p className="mt-1 text-blue-900">
+        Password for all accounts: <code className="rounded bg-white/70 px-1.5 py-0.5 text-xs">{DEMO_PASSWORD}</code>
+      </p>
+      <div className="mt-3 space-y-2">
+        {demoUsers.map((user) => (
+          <button
+            key={user.email}
+            type="button"
+            onClick={() => onSelect(user.email)}
+            className="flex w-full items-center justify-between rounded-xl border border-blue-200 bg-white px-3 py-2 text-left transition-colors hover:bg-blue-100/40"
+          >
+            <span>
+              <span className="block font-semibold capitalize text-slate-900">{user.role}</span>
+              <span className="text-xs text-slate-600">{user.email}</span>
+            </span>
+            <span className="text-xs font-bold uppercase tracking-wide text-[#123c91]">Use</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const inputClass =
+  "h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-500 focus:border-[#123c91] focus:ring-4 focus:ring-blue-100";
+
+export function CombinedAuthPage({ initialMode = "login" }: { initialMode?: "login" | "signup" }) {
+  const [mode, setMode] = useState<"login" | "signup">(initialMode);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [signupRole, setSignupRole] = useState<RegisterRole>("DEVELOPER");
+  const [signup, setSignup] = useState({
+    firstName: "",
+    lastName: "",
+    phoneLocal: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const isLogin = mode === "login";
+
+  async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      if (DEMO_AUTH_ENABLED) {
+        const demoUser = authenticateDemoUser(email, password);
+        if (demoUser) {
+          saveDemoSession(demoUser);
+          window.location.href = getDemoDashboardPath(demoUser.role);
+          return;
+        }
+      }
+
+      const auth = await authApi.login(email.trim(), password);
+      saveAuthSession({
+        username: auth.username,
+        role: auth.role,
+        accessToken: auth.accessToken,
+        refreshToken: auth.refreshToken,
+        userStatus: auth.userStatus,
+      });
+      window.location.href = getDashboardPath(mapBackendRole(auth.role));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSignup(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+
+    if (signup.password !== signup.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const auth = await authApi.register({
+        firstName: signup.firstName.trim(),
+        lastName: signup.lastName.trim(),
+        phoneNumber: toE164Phone(signup.phoneLocal),
+        email: signup.email.trim(),
+        password: signup.password,
+        role: signupRole,
+      });
+      saveAuthSession({
+        username: signup.email.trim(),
+        role: auth.role,
+        accessToken: auth.accessToken,
+        refreshToken: auth.refreshToken,
+        userStatus: auth.userStatus,
+        firstName: signup.firstName.trim(),
+        lastName: signup.lastName.trim(),
+      });
+      window.location.href = getDashboardPath(mapBackendRole(auth.role));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleDemoSelect(selectedEmail: string) {
+    setEmail(selectedEmail);
+    setPassword(DEMO_PASSWORD);
+    setError("");
+  }
 
   return (
     <AuthShell heading={isLogin ? "Welcome back!" : "Create account!"}>
-      <div className="mt-12">
+      <div className="mt-6">
         {isLogin ? (
-          <form className="space-y-6">
-            <AuthField type="email" placeholder="Enter your email address" icon={<MailIcon />} />
-            <AuthField type="password" placeholder="Enter your password" icon={<EyeOffIcon />} />
+          <form className="space-y-4" onSubmit={handleLogin}>
+            {DEMO_AUTH_ENABLED ? <DemoAccountsPanel onSelect={handleDemoSelect} /> : null}
+
+            <AuthField
+              type="email"
+              name="email"
+              placeholder="Enter your email address"
+              icon={<MailIcon />}
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+            <AuthField
+              type="password"
+              name="password"
+              placeholder="Enter your password"
+              icon={<EyeOffIcon />}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+
+            {error ? <p className="text-sm font-semibold text-rose-600">{error}</p> : null}
 
             <div className="flex items-center justify-between gap-4 text-base font-semibold text-slate-700">
               <label className="flex items-center gap-3">
@@ -73,8 +204,12 @@ export function CombinedAuthPage() {
               </a>
             </div>
 
-            <button type="button" className="h-14 w-full rounded-full bg-[#123c91] text-base font-black text-white shadow-sm transition-colors hover:bg-[#0d2f76]">
-              Login
+            <button
+              type="submit"
+              disabled={loading}
+              className="h-14 w-full rounded-full bg-[#123c91] text-base font-black text-white shadow-sm transition-colors hover:bg-[#0d2f76] disabled:opacity-60"
+            >
+              {loading ? "Signing in…" : "Login"}
             </button>
 
             <DividerText>or continue with</DividerText>
@@ -89,35 +224,90 @@ export function CombinedAuthPage() {
             </div>
           </form>
         ) : (
-          <form className="space-y-5">
-            <AuthField type="text" placeholder="Enter your full name" icon={<UserIcon />} />
-            <AuthField type="email" placeholder="Enter your email address" icon={<MailIcon />} />
-            <AuthField type="password" placeholder="Create your password" icon={<EyeOffIcon />} />
-            <AuthField type="password" placeholder="Confirm your password" icon={<EyeOffIcon />} />
-
-            <label className="flex items-start gap-2 text-xs font-semibold leading-relaxed text-slate-700">
-              <input type="checkbox" defaultChecked className="mt-0.5 h-4 w-4 rounded border-slate-300 accent-[#123c91]" />
-              I agree to Payflow's terms, privacy policy, and secure payment rules.
-            </label>
-
-            <button type="button" className="h-14 w-full rounded-full bg-[#123c91] text-base font-black text-white shadow-sm transition-colors hover:bg-[#0d2f76]">
-              Sign up
-            </button>
-
-            <DividerText>or continue with</DividerText>
+          <form className="space-y-4" onSubmit={handleSignup}>
+            <p className="text-sm text-slate-600">
+              {signupRole === "DEVELOPER"
+                ? "Create a developer account to get API keys and accept payments in your app."
+                : "Create a personal Payflow account for wallet and payments."}
+            </p>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <SocialButton label="Google">
-                <GoogleIcon />
-              </SocialButton>
-              <SocialButton label="Facebook">
-                <FacebookIcon />
-              </SocialButton>
+              <label className="block">
+                <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">Account type</span>
+                <select
+                  className={inputClass}
+                  value={signupRole}
+                  onChange={(e) => setSignupRole(e.target.value as RegisterRole)}
+                >
+                  <option value="DEVELOPER">Developer</option>
+                  <option value="USER">Personal account</option>
+                </select>
+              </label>
             </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <input className={inputClass} placeholder="First name" value={signup.firstName} onChange={(e) => setSignup({ ...signup, firstName: e.target.value })} required />
+              <input className={inputClass} placeholder="Last name" value={signup.lastName} onChange={(e) => setSignup({ ...signup, lastName: e.target.value })} required />
+            </div>
+
+            <div className="flex overflow-hidden rounded-2xl border border-slate-300 bg-white">
+              <span className="flex items-center bg-slate-100 px-4 text-sm font-bold text-slate-600">+220</span>
+              <input
+                className="h-12 flex-1 px-4 text-sm font-semibold outline-none"
+                placeholder="712 3456"
+                inputMode="numeric"
+                value={signup.phoneLocal}
+                onChange={(e) => setSignup({ ...signup, phoneLocal: e.target.value.replace(/\D/g, "").slice(0, 7) })}
+                required
+              />
+            </div>
+
+            <AuthField
+              type="email"
+              name="signup-email"
+              placeholder="Email address"
+              icon={<MailIcon />}
+              value={signup.email}
+              onChange={(event) => setSignup({ ...signup, email: event.target.value })}
+            />
+            <AuthField
+              type="password"
+              name="signup-password"
+              placeholder="Password (min 8 characters)"
+              icon={<EyeOffIcon />}
+              value={signup.password}
+              onChange={(event) => setSignup({ ...signup, password: event.target.value })}
+            />
+            <AuthField
+              type="password"
+              name="signup-confirm"
+              placeholder="Confirm password"
+              icon={<EyeOffIcon />}
+              value={signup.confirmPassword}
+              onChange={(event) => setSignup({ ...signup, confirmPassword: event.target.value })}
+            />
+
+            {error ? <p className="text-sm font-semibold text-rose-600">{error}</p> : null}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="h-14 w-full rounded-full bg-[#123c91] text-base font-black text-white shadow-sm transition-colors hover:bg-[#0d2f76] disabled:opacity-60"
+            >
+              {loading ? "Creating account…" : signupRole === "DEVELOPER" ? "Create developer account" : "Create account"}
+            </button>
+
+            <p className="text-center text-xs text-slate-500">
+              Running a business in The Gambia?{" "}
+              <Link href="/merchants/register" className="font-bold text-[#123c91]">
+                Register as a merchant
+              </Link>{" "}
+              in the Payflow Merchant app.
+            </p>
           </form>
         )}
 
-        <p className="mt-14 text-center text-base text-slate-700">
+        <p className="mt-4 text-center text-base text-slate-700">
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <button type="button" onClick={() => setMode(isLogin ? "signup" : "login")} className="font-black text-[#123c91]">
             {isLogin ? "Sign up" : "Login"}

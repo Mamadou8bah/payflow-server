@@ -1,8 +1,10 @@
 package com.mamadou.payflow.admin.service;
 
+import com.mamadou.payflow.admin.dto.AdminWalletResponse;
 import com.mamadou.payflow.audit.entity.AuditLog;
 import com.mamadou.payflow.audit.service.AuditLogService;
 import com.mamadou.payflow.audit.service.AuditTrailBuilder;
+import com.mamadou.payflow.ledger.service.LedgerBalanceComputationService;
 import com.mamadou.payflow.wallet.entity.Wallet;
 import com.mamadou.payflow.wallet.enums.WalletStatus;
 import com.mamadou.payflow.wallet.repository.WalletRepository;
@@ -11,13 +13,41 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AdminWalletService {
 
     private final WalletRepository walletRepository;
+    private final LedgerBalanceComputationService ledgerBalanceComputationService;
     private final AuditLogService auditLogService;
+
+    @Transactional(readOnly = true)
+    public List<AdminWalletResponse> listWallets() {
+        return walletRepository.findAll().stream()
+                .map(this::toAdminWallet)
+                .collect(Collectors.toList());
+    }
+
+    private AdminWalletResponse toAdminWallet(Wallet wallet) {
+        BigDecimal balance = wallet.getLedgerAccount() != null
+                ? ledgerBalanceComputationService.computeBalance(wallet.getLedgerAccount())
+                : BigDecimal.ZERO;
+        String ownerEmail = wallet.getUser() != null ? wallet.getUser().getEmail() : "";
+        return new AdminWalletResponse(
+                wallet.getId(),
+                wallet.getName(),
+                wallet.getCurrency(),
+                wallet.getStatus(),
+                wallet.getUser() != null ? wallet.getUser().getId() : null,
+                ownerEmail,
+                balance
+        );
+    }
 
     @Transactional
     public void freezeWallet(Long walletId, String reason, Long adminId, String adminEmail) {
@@ -66,7 +96,6 @@ public class AdminWalletService {
     }
 
     public long getFrozenWalletCount() {
-        // Implementation depends on WalletRepository having a method to count by status
-        return 0; // Placeholder
+        return walletRepository.countByStatus(WalletStatus.SUSPENDED);
     }
 }

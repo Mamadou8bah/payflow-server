@@ -10,10 +10,27 @@
     "web": "npx expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/space-grotesk": "^0.4.1",
+    "@expo/metro-runtime": "~5.0.5",
+    "@expo/vector-icons": "^14.1.0",
+    "@pdf-lib/standard-fonts": "^1.0.0",
+    "@pdf-lib/upng": "^1.0.1",
     "expo": "^53.0.0",
+    "expo-asset": "~11.1.7",
+    "expo-file-system": "~18.1.11",
+    "expo-font": "~13.3.2",
+    "expo-linear-gradient": "~14.1.5",
+    "expo-sharing": "~13.1.5",
     "expo-status-bar": "~2.2.3",
+    "@react-native-async-storage/async-storage": "2.1.2",
+    "expo-secure-store": "~14.2.3",
+    "pdf-lib": "^1.17.1",
     "react": "19.0.0",
-    "react-native": "0.79.0"
+    "react-dom": "19.0.0",
+    "react-native": "0.79.0",
+    "react-native-qrcode-svg": "^6.3.21",
+    "react-native-svg": "15.11.2",
+    "react-native-web": "^0.20.0"
   },
   "devDependencies": {
     "@types/react": "^19.1.2",

@@ -14,6 +14,7 @@ import com.mamadou.payflow.common.Exception.ProfileAlreadyExistException;
 import com.mamadou.payflow.common.metrics.PayFlowMetricsService;
 import com.mamadou.payflow.notification.service.TwoFactorDeliveryService;
 import com.mamadou.payflow.user.entity.User;
+import com.mamadou.payflow.user.enums.Role;
 import com.mamadou.payflow.user.enums.UserStatus;
 import com.mamadou.payflow.user.repository.UserRepository;
 import io.micrometer.core.instrument.Timer;
@@ -35,6 +36,7 @@ public class AuthService {
 
     private static final long ACCESS_TOKEN_TTL_SECONDS = 15 * 60;
     private static final int MAX_FAILED_LOGIN_ATTEMPTS = 5;
+    private static final java.util.Set<Role> SELF_REGISTER_ROLES = java.util.EnumSet.of(Role.USER, Role.DEVELOPER);
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -48,6 +50,12 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
         metricsService.recordAuthRegisterAttempt();
         log.info("Registration attempt for phoneNumber={}", request.phoneNumber());
+
+        Role role = request.role() == null ? Role.DEVELOPER : request.role();
+        if (!SELF_REGISTER_ROLES.contains(role)) {
+            log.warn("Registration failed: role not allowed for self-registration, role={}", role);
+            throw new IllegalArgumentException("This account type must use its dedicated registration flow");
+        }
         
         if (userRepository.existsByPhoneNumber(request.phoneNumber())) {
             log.warn("Registration failed: phoneNumber already exists, phoneNumber={}", request.phoneNumber());
@@ -88,6 +96,11 @@ public class AuthService {
                 user.getId(), user.getPhoneNumber(), user.getUserStatus());
             metricsService.recordAuthLoginFailure();
             throw new InvalidPasswordException("Account is locked or suspended");
+        }
+
+        if (user.getUserStatus() == UserStatus.BANNED) {
+            metricsService.recordAuthLoginFailure();
+            throw new InvalidPasswordException("Account is not available");
         }
         
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {

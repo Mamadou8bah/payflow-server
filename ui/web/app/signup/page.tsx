@@ -1,5 +1,5 @@
 import { CombinedAuthPage } from "../auth-content";
 
 export default function SignupPage() {
-  return <CombinedAuthPage />;
+  return <CombinedAuthPage initialMode="signup" />;
 }

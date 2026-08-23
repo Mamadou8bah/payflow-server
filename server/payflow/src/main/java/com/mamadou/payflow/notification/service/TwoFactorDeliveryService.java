@@ -14,7 +14,7 @@ public class TwoFactorDeliveryService {
     private final EmailSender emailSender;
 
     public void sendCode(User user, String code) {
-        if (user.getRole() == Role.MERCHANT || user.getRole() == Role.ADMIN) {
+        if (user.getRole() == Role.MERCHANT || user.getRole() == Role.DEVELOPER || user.getRole() == Role.ADMIN) {
             sendEmailCode(user, code);
             return;
         }

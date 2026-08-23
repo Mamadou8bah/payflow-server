@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Payflow Merchant",
+    "slug": "payflow-merchant",
+    "scheme": "payflowmerchant",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android", "web"],
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "bundleIdentifier": "gm.payflow.merchant",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "gm.payflow.merchant",
+      "adaptiveIcon": {
+        "backgroundColor": "#0a0a0a"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "payflow-merchant-app"
+      }
+    },
+    "plugins": ["expo-asset", "expo-font", "expo-secure-store"]
+  }
+}

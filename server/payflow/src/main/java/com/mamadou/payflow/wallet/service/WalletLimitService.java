@@ -48,7 +48,8 @@ public class WalletLimitService {
 
     @Transactional
     public WalletLimitResponse updateWalletLimit(Long walletId, WalletLimitUpdateRequest request) {
-        Wallet wallet = getOwnedWallet(walletId);
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
         WalletLimit limit = getLimit(wallet);
 
         if (request.getMinTransactionAmount() != null) {
@@ -79,7 +80,8 @@ public class WalletLimitService {
 
     @Transactional
     public WalletLimitResponse resetUsage(Long walletId) {
-        Wallet wallet = getOwnedWallet(walletId);
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
         WalletLimit limit = getLimit(wallet);
         limit.setAmountSpentToday(BigDecimal.ZERO);
         limit.setAmountSpentThisWeek(BigDecimal.ZERO);

@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 @Data
 public class TransferRequest {
-    @NotNull(message = "Source wallet is required")
+    /** Optional — primary wallet is used when omitted */
     private Long sourceWalletId;
 
     @NotNull(message = "Destination wallet is required")

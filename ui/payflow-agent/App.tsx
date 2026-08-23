@@ -1,90 +1,110 @@
+import {
+  SpaceGrotesk_400Regular,
+  SpaceGrotesk_500Medium,
+  SpaceGrotesk_600SemiBold,
+  SpaceGrotesk_700Bold,
+  useFonts,
+} from "@expo-google-fonts/space-grotesk";
+import { useEffect, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, SafeAreaView, StyleSheet, View } from "react-native";
+import { BottomNav } from "./src/components/BottomNav";
+import { AuthProvider, useAuth } from "./src/context/AuthContext";
+import { AgentProvider, navTabFor, useAgent } from "./src/context/AgentContext";
+import { applyFontDefaults } from "./src/setupFonts";
+import { ActivityScreen } from "./src/screens/ActivityScreen";
+import { ConfirmScreen } from "./src/screens/ConfirmScreen";
+import { HomeScreen } from "./src/screens/HomeScreen";
+import { LoginScreen } from "./src/screens/LoginScreen";
+import { MoreScreen } from "./src/screens/MoreScreen";
+import { NewDepositScreen } from "./src/screens/NewDepositScreen";
+import { NewWithdrawalScreen } from "./src/screens/NewWithdrawalScreen";
+import { ProfileScreen } from "./src/screens/ProfileScreen";
+import { QueueScreen } from "./src/screens/QueueScreen";
+import { ScanScreen } from "./src/screens/ScanScreen";
+import { SupportScreen } from "./src/screens/SupportScreen";
+import { colors } from "./src/theme";
+import type { TabId } from "./src/types";
 
-const tasks = [
-  "Accept and confirm deposits",
-  "Review withdrawal requests",
-  "Process merchant payouts",
-  "Monitor queue status and activity"
-];
+const mainTabs = new Set<TabId>(["home", "scan", "queue", "activity", "more"]);
 
-export default function App() {
+function MainApp() {
+  const { tab, setTab } = useAgent();
+  const showNav = mainTabs.has(tab);
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="light" />
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.hero}>
-          <Text style={styles.kicker}>Payflow Agent</Text>
-          <Text style={styles.title}>Operations for agent-led cash movements.</Text>
-          <Text style={styles.subtitle}>
-            A companion app for agents handling deposits, withdrawals, and assisted customer payments.
-          </Text>
-        </View>
+      <StatusBar style="dark" />
+      <View style={styles.body}>
+        {tab === "home" && <HomeScreen />}
+        {tab === "scan" && <ScanScreen />}
+        {tab === "queue" && <QueueScreen />}
+        {tab === "activity" && <ActivityScreen />}
+        {tab === "more" && <MoreScreen />}
+        {tab === "confirm" && <ConfirmScreen />}
+        {tab === "new-deposit" && <NewDepositScreen />}
+        {tab === "new-withdrawal" && <NewWithdrawalScreen />}
+        {tab === "profile" && <ProfileScreen />}
+        {tab === "support" && <SupportScreen />}
+      </View>
 
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Agent workflow</Text>
-          {tasks.map((task) => (
-            <Text key={task} style={styles.feature}>• {task}</Text>
-          ))}
-        </View>
-      </ScrollView>
+      {showNav ? <BottomNav active={navTabFor(tab)} onChange={setTab} /> : null}
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#07111f"
-  },
-  container: {
-    padding: 24,
-    gap: 16
-  },
-  hero: {
-    backgroundColor: "#0d1b30",
-    borderRadius: 24,
-    padding: 24,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)"
-  },
-  kicker: {
-    color: "#8b5cf6",
-    textTransform: "uppercase",
-    letterSpacing: 1.4,
-    fontSize: 12,
-    fontWeight: "700"
-  },
-  title: {
-    color: "#eef4ff",
-    fontSize: 34,
-    fontWeight: "800",
-    marginTop: 10,
-    lineHeight: 40
-  },
-  subtitle: {
-    color: "#a8b7d1",
-    fontSize: 16,
-    lineHeight: 24,
-    marginTop: 12
-  },
-  card: {
-    backgroundColor: "#0d1b30",
-    borderRadius: 24,
-    padding: 24,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)"
-  },
-  sectionTitle: {
-    color: "#eef4ff",
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 12
-  },
-  feature: {
-    color: "#d5def0",
-    fontSize: 15,
-    lineHeight: 24,
-    marginTop: 4
+function Root() {
+  const { session, loading } = useAuth();
+  if (loading) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
   }
+  if (!session) {
+    return <LoginScreen />;
+  }
+  return (
+    <AgentProvider>
+      <MainApp />
+    </AgentProvider>
+  );
+}
+
+export default function App() {
+  const [fontsLoaded] = useFonts({
+    SpaceGrotesk_400Regular,
+    SpaceGrotesk_500Medium,
+    SpaceGrotesk_600SemiBold,
+    SpaceGrotesk_700Bold,
+  });
+  const fontsApplied = useRef(false);
+
+  useEffect(() => {
+    if (fontsLoaded && !fontsApplied.current) {
+      applyFontDefaults();
+      fontsApplied.current = true;
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  return (
+    <AuthProvider>
+      <Root />
+    </AuthProvider>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: colors.background },
+  body: { flex: 1 },
+  loading: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.background },
 });

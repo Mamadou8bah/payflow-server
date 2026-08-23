@@ -148,6 +148,7 @@ public class Withdrawal extends AuditableEntity {
     }
 
     public enum WithdrawalStatus {
+        AWAITING_AGENT, // Merchant intent created; agent must scan QR and complete
         PENDING,      // Awaiting approval
         APPROVED,     // Approved by agent or auto-approved
         PROCESSING,   // Payment processing

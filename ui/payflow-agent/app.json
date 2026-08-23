@@ -6,6 +6,32 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "platforms": ["ios", "android", "web"],
-    "assetBundlePatterns": ["**/*"]
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "bundleIdentifier": "gm.payflow.agent",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "gm.payflow.agent",
+      "adaptiveIcon": {
+        "backgroundColor": "#0a0a0a"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "payflow-agent-app"
+      }
+    },
+    "plugins": [
+      "expo-font",
+      "expo-asset",
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow PayFlow Agent to scan customer QR codes."
+        }
+      ]
+    ]
   }
 }

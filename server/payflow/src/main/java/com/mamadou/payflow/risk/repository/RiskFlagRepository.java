@@ -26,6 +26,8 @@ public interface RiskFlagRepository extends JpaRepository<RiskFlag, Long> {
 
     long countByWalletIdAndRiskLevelAndResolvedFalse(Long walletId, RiskLevel riskLevel);
 
+    long countByRiskLevelAndResolvedFalse(RiskLevel riskLevel);
+
     Optional<RiskFlag> findByTransactionId(Long transactionId);
 
     List<RiskFlag> findByResolvedFalseAndFlaggedAtBefore(LocalDateTime dateTime);

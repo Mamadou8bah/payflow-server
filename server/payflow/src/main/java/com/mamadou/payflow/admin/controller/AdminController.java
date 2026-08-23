@@ -1,13 +1,26 @@
 package com.mamadou.payflow.admin.controller;
 
-import com.mamadou.payflow.admin.dto.*;
+import com.mamadou.payflow.admin.dto.AdminDashboardResponse;
+import com.mamadou.payflow.admin.dto.AdminWalletResponse;
+import com.mamadou.payflow.admin.dto.AuditLogEntryResponse;
+import com.mamadou.payflow.admin.dto.FreezeWalletAdminRequest;
+import com.mamadou.payflow.admin.dto.ReprocessWebhookAdminRequest;
+import com.mamadou.payflow.admin.dto.ReverseTransactionAdminRequest;
 import com.mamadou.payflow.admin.service.*;
+import com.mamadou.payflow.audit.entity.AuditLog;
 import com.mamadou.payflow.audit.repository.AuditLogRepository;
 import com.mamadou.payflow.reconciliation.dto.ReconciliationReportResponse;
+import com.mamadou.payflow.risk.enums.RiskLevel;
 import com.mamadou.payflow.risk.repository.RiskFlagRepository;
+import com.mamadou.payflow.transaction.repository.TransactionRepository;
+import com.mamadou.payflow.user.entity.User;
+import com.mamadou.payflow.wallet.enums.WalletStatus;
 import com.mamadou.payflow.wallet.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -15,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -29,10 +43,16 @@ public class AdminController {
     private final AdminWebhookService adminWebhookService;
     private final AdminReconciliationService adminReconciliationService;
     private final WalletRepository walletRepository;
+    private final TransactionRepository transactionRepository;
     private final RiskFlagRepository riskFlagRepository;
     private final AuditLogRepository auditLogRepository;
 
     // ==================== WALLET OPERATIONS ====================
+
+    @GetMapping("/wallets")
+    public ResponseEntity<List<AdminWalletResponse>> listWallets() {
+        return ResponseEntity.ok(adminWalletService.listWallets());
+    }
 
     @PostMapping("/wallets/freeze")
     public ResponseEntity<String> freezeWallet(
@@ -129,15 +149,15 @@ public class AdminController {
         log.info("Fetching admin dashboard");
         
         long totalWallets = walletRepository.count();
-        long activeWallets = 0; // Depends on WalletRepository.countByStatus
+        long activeWallets = walletRepository.countByStatus(WalletStatus.ACTIVE);
         long frozenWallets = adminWalletService.getFrozenWalletCount();
-        
-        long totalTransactions = 0; // Depends on TransactionRepository.count()
+
+        long totalTransactions = transactionRepository.count();
         long failedTransactions = adminTransactionService.getFailedTransactionCount();
         long pendingTransactions = adminTransactionService.getPendingTransactionCount();
-        
+
         long totalRiskFlags = riskFlagRepository.count();
-        long criticalRiskFlags = 0; // Depends on RiskFlagRepository.countByCritical
+        long criticalRiskFlags = riskFlagRepository.countByRiskLevelAndResolvedFalse(RiskLevel.CRITICAL);
         
         long unresolvedMismatches = adminReconciliationService.getUnresolvedMismatchesCount();
         long failedOperations = auditLogRepository.findFailedOperations().size();
@@ -174,14 +194,35 @@ public class AdminController {
     }
 
     @GetMapping("/audit-trail")
-    public ResponseEntity<String> getAuditTrail() {
-        log.info("Fetching admin audit trail");
-        long auditLogCount = auditLogRepository.count();
-        return ResponseEntity.ok("Total audit logs: " + auditLogCount);
+    public ResponseEntity<Page<AuditLogEntryResponse>> getAuditTrail(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size
+    ) {
+        Page<AuditLog> logs = auditLogRepository.findAll(
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"))
+        );
+        return ResponseEntity.ok(logs.map(this::toAuditEntry));
+    }
+
+    private AuditLogEntryResponse toAuditEntry(AuditLog log) {
+        return new AuditLogEntryResponse(
+                log.getId(),
+                log.getActorId(),
+                log.getActorEmail(),
+                log.getTimestamp(),
+                log.getActionType(),
+                log.getEntityType(),
+                log.getEntityId(),
+                log.getChangeDescription(),
+                log.isSuccess()
+        );
     }
 
     private Long extractAdminId(Authentication authentication) {
-        // In a real implementation, extract from JWT or user object
-        return 1L; // Placeholder
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof User user) {
+            return user.getId();
+        }
+        return null;
     }
 }

@@ -1,14 +1,18 @@
 package com.mamadou.payflow.withdrawal.controller;
 
+import com.mamadou.payflow.common.security.SecurityRoleUtils;
+import com.mamadou.payflow.user.entity.User;
 import com.mamadou.payflow.withdrawal.dto.CreateWithdrawalRequest;
+import com.mamadou.payflow.withdrawal.dto.WithdrawalResponse;
 import com.mamadou.payflow.withdrawal.entity.Withdrawal;
 import com.mamadou.payflow.withdrawal.service.WithdrawalService;
-import com.mamadou.payflow.user.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/withdrawals")
@@ -22,15 +26,26 @@ public class WithdrawalController {
             @Valid @RequestBody CreateWithdrawalRequest request,
             @AuthenticationPrincipal User currentUser
     ) {
-        boolean isAgent = currentUser.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_AGENT"));
+        boolean isAgent = SecurityRoleUtils.isAgent(currentUser);
         Withdrawal withdrawal = withdrawalService.createWithdrawal(request, currentUser.getId(), isAgent);
         return ResponseEntity.ok(WithdrawalResponse.from(withdrawal));
     }
 
-}
+    @GetMapping
+    public ResponseEntity<List<WithdrawalResponse>> listWithdrawals(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(withdrawalService.listForUser(currentUser.getId()));
+    }
 
-record WithdrawalResponse(Long id, Long walletId, Long userId, Long agentId, String withdrawalType, String status, java.math.BigDecimal amount, String currency, String withdrawalMethod, String reference) {
-    static WithdrawalResponse from(Withdrawal d) {
-        return new WithdrawalResponse(d.getId(), d.getWallet().getId(), d.getUser().getId(), d.getAgent() != null ? d.getAgent().getId() : null, d.getWithdrawalType().name(), d.getStatus().name(), d.getAmount(), d.getCurrency(), d.getWithdrawalMethod(), d.getReference());
+    @GetMapping("/{id}")
+    public ResponseEntity<WithdrawalResponse> getWithdrawal(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        return ResponseEntity.ok(withdrawalService.getById(id, currentUser.getId()));
+    }
+
+    @GetMapping("/reference/{reference}")
+    public ResponseEntity<WithdrawalResponse> getWithdrawalByReference(@PathVariable String reference) {
+        return ResponseEntity.ok(withdrawalService.getByReference(reference));
     }
 }

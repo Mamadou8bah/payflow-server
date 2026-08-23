@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +41,20 @@ public class PaymentLinkService {
                 .build();
 
         link = paymentLinkRepository.save(link);
+        return PaymentLinkResponse.from(link);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PaymentLinkResponse> listForMerchant(Long merchantId) {
+        return paymentLinkRepository.findByMerchantIdOrderByIdDesc(merchantId).stream()
+                .map(PaymentLinkResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public PaymentLinkResponse getById(Long merchantId, Long linkId) {
+        PaymentLink link = paymentLinkRepository.findByIdAndMerchantId(linkId, merchantId)
+                .orElseThrow(() -> new IllegalArgumentException("Payment link not found"));
         return PaymentLinkResponse.from(link);
     }
 }

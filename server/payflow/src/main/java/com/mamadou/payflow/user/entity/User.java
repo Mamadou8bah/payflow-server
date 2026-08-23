@@ -103,7 +103,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return role==Role.MERCHANT? email:phoneNumber;
+        return role == Role.MERCHANT || role == Role.DEVELOPER ? email : phoneNumber;
     }
 
     @Override

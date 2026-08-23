@@ -7,6 +7,7 @@ import com.mamadou.payflow.risk.enums.RiskLevel;
 import com.mamadou.payflow.risk.service.RiskEngineService;
 import com.mamadou.payflow.risk.service.RiskFlagService;
 import com.mamadou.payflow.risk.service.RiskRuleService;
+import com.mamadou.payflow.wallet.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,7 @@ public class RiskController {
     private final RiskEngineService riskEngineService;
     private final RiskFlagService riskFlagService;
     private final RiskRuleService riskRuleService;
+    private final WalletService walletService;
 
     /**
      * Evaluate risk for a transaction
@@ -50,6 +52,7 @@ public class RiskController {
             walletId, amount, transactionId);
 
         try {
+            walletService.assertWalletAccess(walletId);
             RiskEvaluationResult result = riskEngineService.evaluateTransactionRisk(walletId, amount, transactionId);
             return ResponseEntity.ok(ApiResponse.success("Risk evaluation completed", result));
         } catch (IllegalArgumentException e) {
@@ -72,6 +75,7 @@ public class RiskController {
             @PathVariable Long walletId) {
 
         try {
+            walletService.assertWalletAccess(walletId);
             List<RiskFlagResponse> flags = riskFlagService.getUnresolvedFlagsForWallet(walletId);
             return ResponseEntity.ok(ApiResponse.success(
                 String.format("Found %d unresolved risk flags", flags.size()), flags));
@@ -93,6 +97,7 @@ public class RiskController {
             Pageable pageable) {
 
         try {
+            walletService.assertWalletAccess(walletId);
             Page<RiskFlagResponse> flags = riskFlagService.getFlagsForWallet(walletId, pageable);
             return ResponseEntity.ok(ApiResponse.success("Risk flags retrieved", flags));
         } catch (Exception e) {
@@ -114,6 +119,7 @@ public class RiskController {
             Pageable pageable) {
 
         try {
+            walletService.assertWalletAccess(walletId);
             Page<RiskFlagResponse> flags = riskFlagService.getFlagsByRiskLevel(walletId, level, pageable);
             return ResponseEntity.ok(ApiResponse.success(
                 String.format("Risk flags with level %s retrieved", level), flags));
@@ -159,6 +165,7 @@ public class RiskController {
             @RequestParam(defaultValue = "24") int hoursBack) {
 
         try {
+            walletService.assertWalletAccess(walletId);
             List<RiskFlagResponse> flags = riskFlagService.getRecentFlags(walletId, hoursBack);
             return ResponseEntity.ok(ApiResponse.success(
                 String.format("Found %d risk flags in last %d hours", flags.size(), hoursBack), flags));
@@ -202,6 +209,7 @@ public class RiskController {
             @PathVariable Long walletId) {
 
         try {
+            walletService.assertWalletAccess(walletId);
             Map<String, Object> summary = riskEngineService.getWalletRiskStats(walletId);
             return ResponseEntity.ok(ApiResponse.success("Risk summary retrieved", summary));
         } catch (Exception e) {

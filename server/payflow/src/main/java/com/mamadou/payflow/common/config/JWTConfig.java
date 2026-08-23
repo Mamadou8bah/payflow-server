@@ -28,11 +28,27 @@ public class JWTConfig {
     @Value("${jwt.refresh-token-expiration-days:7}")
     private long refreshTokenExpirationDays;
 
+    private static final String LOCAL_DEV_SECRET =
+            "ZGV2ZWxvcG1lbnQtc2VjcmV0LWtleS1mb3ItcGF5Zmxvdy1hcHAtMzItYnl0ZXM=";
+
     private SecretKey signingKey;
+
+    @Value("${spring.profiles.active:}")
+    private String activeProfiles;
 
     @PostConstruct
     public void init() {
-        this.signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException("jwt.secret / JWT_SECRET must be configured");
+        }
+        if (activeProfiles != null && activeProfiles.contains("prod") && LOCAL_DEV_SECRET.equals(secret)) {
+            throw new IllegalStateException("JWT_SECRET must not use the local development default in production");
+        }
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        if (keyBytes.length < 32) {
+            throw new IllegalStateException("JWT_SECRET must decode to at least 32 bytes");
+        }
+        this.signingKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateAccessToken(String subject, Map<String, Object> claims) {

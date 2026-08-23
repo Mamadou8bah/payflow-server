@@ -40,6 +40,52 @@ public class TransferReversalService {
     private final UserRepository userRepository;
 
     @Transactional
+    public TransactionResponse reverseAsAdmin(Long transactionId, ReversalRequest request) {
+        ReversalRequest reversalRequest = request == null ? new ReversalRequest() : request;
+        Transaction original = transactionService.getEntity(transactionId);
+        String fingerprint = "admin-reverse|" + transactionId + "|" + nullToBlank(reversalRequest.getReason());
+
+        return idempotencyService.findExistingTransaction(reversalRequest.getIdempotencyKey(), fingerprint)
+                .map(transactionService::toResponse)
+                .orElseGet(() -> {
+                    validateOriginalForAdmin(original);
+
+                    LockedWallets lockedWallets = lockWallets(
+                            original.getDestinationWallet().getId(),
+                            original.getSourceWallet().getId()
+                    );
+                    Wallet refundSource = lockedWallets.refundSource();
+                    Wallet refundDestination = lockedWallets.refundDestination();
+
+                    transferValidationService.ensureSufficientBalance(refundSource, original.getAmount());
+
+                    Transaction reversal = transactionService.createPendingReversal(
+                            original,
+                            original.getInitiatedBy(),
+                            resolveReason(reversalRequest),
+                            null
+                    );
+
+                    try {
+                        LedgerTraceResponse trace = ledgerService.recordFinancialTransaction(ledgerPostingRequest(
+                                reversal.getReference(),
+                                original.getReference(),
+                                reversal.getCurrency(),
+                                reversal.getDescription(),
+                                entry(refundSource.getLedgerAccount().getCode(), LedgerPostingSide.DEBIT, reversal.getAmount(), "Admin transfer reversal debit"),
+                                entry(refundDestination.getLedgerAccount().getCode(), LedgerPostingSide.CREDIT, reversal.getAmount(), "Admin transfer reversal credit")
+                        ));
+                        Transaction completed = transactionService.completeReversal(original, reversal, trace.getTraceId());
+                        idempotencyService.saveKey(reversalRequest.getIdempotencyKey(), fingerprint, completed);
+                        return transactionService.toResponse(completed);
+                    } catch (RuntimeException exception) {
+                        transactionService.markFailed(reversal, exception.getMessage());
+                        throw exception;
+                    }
+                });
+    }
+
+    @Transactional
     public TransactionResponse reverse(Long transactionId, ReversalRequest request) {
         ReversalRequest reversalRequest = request == null ? new ReversalRequest() : request;
         Transaction original = transactionService.getEntity(transactionId);
@@ -84,6 +130,18 @@ public class TransferReversalService {
                         throw exception;
                     }
                 });
+    }
+
+    private void validateOriginalForAdmin(Transaction original) {
+        if (original.getType() != TransactionType.TRANSFER) {
+            throw new TransactionException("Only wallet transfers can be reversed");
+        }
+        if (original.getStatus() != TransactionStatus.COMPLETED) {
+            throw new TransactionException("Only completed transfers can be reversed");
+        }
+        if (original.getReversalTransaction() != null || original.getReversedAt() != null) {
+            throw new TransactionException("Transfer has already been reversed");
+        }
     }
 
     private void validateOriginal(Transaction original, User currentUser) {

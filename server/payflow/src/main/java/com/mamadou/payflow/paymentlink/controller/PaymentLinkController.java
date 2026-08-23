@@ -22,4 +22,17 @@ public class PaymentLinkController {
                                                       @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(paymentLinkService.create(currentUser.getId(), request));
     }
+
+    @GetMapping
+    public ResponseEntity<java.util.List<PaymentLinkResponse>> list(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(paymentLinkService.listForMerchant(currentUser.getId()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PaymentLinkResponse> getById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        return ResponseEntity.ok(paymentLinkService.getById(currentUser.getId(), id));
+    }
 }

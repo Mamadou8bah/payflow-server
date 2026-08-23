@@ -1,5 +1,6 @@
 package com.mamadou.payflow.transaction.repository;
 
+import com.mamadou.payflow.transaction.enums.TransactionType;
 import com.mamadou.payflow.transaction.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -16,6 +17,7 @@ import java.util.Optional;
 public interface TransactionRepository extends JpaRepository<Transaction, Long>, JpaSpecificationExecutor<Transaction> {
     Optional<Transaction> findByReference(String reference);
     boolean existsByReference(String reference);
+    List<Transaction> findByInitiatedByIdAndTypeOrderByCreatedAtDesc(Long initiatedById, TransactionType type);
     List<Transaction> findBySourceWalletIdOrDestinationWalletIdOrderByCreatedAtDesc(Long sourceWalletId, Long destinationWalletId);
 
     // Risk evaluation queries

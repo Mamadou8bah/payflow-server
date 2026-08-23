@@ -85,6 +85,9 @@ public class Transaction {
     @Column(length = 255)
     private String failureReason;
 
+    @Column(name = "external_transaction_id", length = 120)
+    private String externalTransactionId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_transaction_id")
     private Transaction parentTransaction;

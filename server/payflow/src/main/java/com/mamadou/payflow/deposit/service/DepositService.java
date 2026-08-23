@@ -1,28 +1,31 @@
 package com.mamadou.payflow.deposit.service;
 
+import com.mamadou.payflow.common.security.SecurityRoleUtils;
 import com.mamadou.payflow.deposit.dto.CreateDepositRequest;
+import com.mamadou.payflow.deposit.dto.DepositResponse;
 import com.mamadou.payflow.deposit.entity.Deposit;
 import com.mamadou.payflow.deposit.repository.DepositRepository;
+import com.mamadou.payflow.fraud.service.FraudDetectionService;
 import com.mamadou.payflow.transaction.entity.Transaction;
-import com.mamadou.payflow.transaction.enums.TransactionType;
 import com.mamadou.payflow.transaction.enums.TransactionStatus;
+import com.mamadou.payflow.transaction.enums.TransactionType;
 import com.mamadou.payflow.transaction.repository.TransactionRepository;
 import com.mamadou.payflow.user.entity.User;
 import com.mamadou.payflow.user.repository.UserRepository;
 import com.mamadou.payflow.wallet.entity.Wallet;
-import com.mamadou.payflow.wallet.repository.WalletRepository;
-import com.mamadou.payflow.webhook.service.ModemPayWebhookService;
-import com.mamadou.payflow.webhook.client.ModemPayClient;
+import com.mamadou.payflow.wallet.exception.WalletOperationException;
+import com.mamadou.payflow.wallet.service.WalletService;
 import com.mamadou.payflow.webhook.client.CreateChargeRequest;
 import com.mamadou.payflow.webhook.client.CreateChargeResponse;
+import com.mamadou.payflow.webhook.client.ModemPayClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,33 +33,20 @@ import java.util.UUID;
 public class DepositService {
 
     private final DepositRepository depositRepository;
-    private final WalletRepository walletRepository;
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
-    private final ModemPayWebhookService modemPayWebhookService;
     private final ModemPayClient modemPayClient;
     private final com.mamadou.payflow.idempotency.service.IdempotencyService idempotencyService;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+    private final WalletService walletService;
+    private final FraudDetectionService fraudDetectionService;
 
-    /**
-     * Create a deposit record and (optionally) initialize a Modem Pay charge
-     * For agent deposits, the agentId parameter is set and userId points to the target user.
-     */
     @Transactional
     public Deposit createDeposit(CreateDepositRequest request, Long actorId, boolean isAgent) {
         User actor = userRepository.findById(actorId).orElseThrow(() -> new IllegalArgumentException("Actor not found"));
-        User targetUser;
-        if (isAgent && request.getUserId() != null) {
-            targetUser = userRepository.findById(request.getUserId())
-                    .orElseThrow(() -> new IllegalArgumentException("Target user not found"));
-        } else {
-            targetUser = actor;
-        }
+        User targetUser = resolveTargetUser(actor, isAgent, request.getUserId());
+        Wallet wallet = resolveWallet(targetUser, request.getWalletId(), request.getCurrency());
 
-        Wallet wallet = walletRepository.findById(request.getWalletId())
-                .orElseThrow(() -> new IllegalArgumentException("Wallet not found"));
-
-        // If client provided an idempotency key and a deposit already exists, return it
         if (request.getIdempotencyKey() != null && !request.getIdempotencyKey().isBlank()) {
             var existing = depositRepository.findByIdempotencyKey(request.getIdempotencyKey());
             if (existing.isPresent()) {
@@ -64,38 +54,104 @@ public class DepositService {
             }
         }
 
+        boolean internalMerchantFlow = isInternalMerchantFlow(actor, request);
+        String currency = request.getCurrency() != null && !request.getCurrency().isBlank()
+                ? request.getCurrency().trim().toUpperCase()
+                : wallet.getCurrency();
+
+        String reference = generateReference();
+        fraudDetectionService.checkBeforeExecution(
+                reference,
+                targetUser,
+                wallet,
+                request.getAmount(),
+                "deposit"
+        );
+
         Deposit deposit = Deposit.builder()
                 .wallet(wallet)
                 .user(targetUser)
                 .agent(isAgent ? actor : null)
                 .depositType(isAgent ? Deposit.DepositType.AGENT : Deposit.DepositType.SELF)
-                .status(Deposit.DepositStatus.PENDING)
+                .status(internalMerchantFlow ? Deposit.DepositStatus.AWAITING_AGENT : Deposit.DepositStatus.PENDING)
                 .amount(request.getAmount())
-                .currency(request.getCurrency())
-                .paymentMethod(request.getPaymentMethod())
+                .currency(currency)
+                .paymentMethod(internalMerchantFlow ? null : request.getPaymentMethod())
                 .phoneNumber(request.getPhoneNumber())
                 .description(request.getDescription())
-                .reference(generateReference())
+                .reference(reference)
                 .idempotencyKey(request.getIdempotencyKey())
                 .build();
 
         deposit = depositRepository.save(deposit);
 
-        // Create a pending Transaction record linked to this deposit.
-        // Ledger double-entry will be performed when the provider confirms the payment via webhook.
         Transaction transaction = Transaction.builder()
-            .reference(deposit.getReference())
-            .type(TransactionType.WALLET_CREDIT)
-            .status(TransactionStatus.PENDING)
-            .destinationWallet(wallet)
-            .initiatedBy(actor)
-            .amount(deposit.getAmount())
-            .currency(deposit.getCurrency())
-            .description("Deposit created: " + deposit.getReference())
-            .build();
-        transaction = transactionRepository.save(transaction);
+                .reference(deposit.getReference())
+                .type(TransactionType.WALLET_CREDIT)
+                .status(TransactionStatus.PENDING)
+                .destinationWallet(wallet)
+                .initiatedBy(actor)
+                .amount(deposit.getAmount())
+                .currency(deposit.getCurrency())
+                .description("Deposit created: " + deposit.getReference())
+                .build();
+        transactionRepository.save(transaction);
 
-        // Create ModemPay charge so the client can complete payment, with idempotency persistence
+        if (!internalMerchantFlow) {
+            initializeModemPayCharge(request, deposit);
+        }
+
+        log.info("Deposit created: {} for user {} internal={}", deposit.getReference(), targetUser.getId(), internalMerchantFlow);
+        return deposit;
+    }
+
+    @Transactional(readOnly = true)
+    public List<DepositResponse> listForUser(Long userId) {
+        return depositRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(DepositResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public DepositResponse getById(Long id, Long userId) {
+        Deposit deposit = depositRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Deposit not found"));
+        if (deposit.getUser().getId() != userId) {
+            throw new IllegalArgumentException("Deposit not found");
+        }
+        return DepositResponse.from(deposit);
+    }
+
+    @Transactional(readOnly = true)
+    public DepositResponse getByReference(String reference) {
+        Deposit deposit = depositRepository.findByReferenceIgnoreCase(reference)
+                .orElseThrow(() -> new IllegalArgumentException("Deposit not found"));
+        return DepositResponse.from(deposit);
+    }
+
+    private boolean isInternalMerchantFlow(User actor, CreateDepositRequest request) {
+        if (SecurityRoleUtils.isMerchant(actor)) {
+            return true;
+        }
+        return request.getPaymentMethod() == null || request.getPaymentMethod().isBlank();
+    }
+
+    private User resolveTargetUser(User actor, boolean isAgent, Long userId) {
+        if (isAgent && userId != null) {
+            return userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("Target user not found"));
+        }
+        return actor;
+    }
+
+    private Wallet resolveWallet(User targetUser, Long walletId, String currency) {
+        if (walletId != null) {
+            return walletService.getWalletForUser(walletId, targetUser.getId());
+        }
+        return walletService.resolvePrimaryWallet(targetUser.getId(), currency);
+    }
+
+    private void initializeModemPayCharge(CreateDepositRequest request, Deposit deposit) {
         try {
             CreateChargeRequest chargeReq = new CreateChargeRequest();
             chargeReq.setAmount(deposit.getAmount());
@@ -111,14 +167,13 @@ public class DepositService {
             }
             chargeReq.setIdempotencyKey(idempotency);
 
-            // Check persisted idempotency
             var recordOpt = idempotencyService.findByKey(idempotency);
             if (recordOpt.isPresent() && "COMPLETED".equals(recordOpt.get().getStatus()) && recordOpt.get().getResponsePayload() != null) {
                 CreateChargeResponse cached = objectMapper.readValue(recordOpt.get().getResponsePayload(), CreateChargeResponse.class);
                 deposit.setExternalPaymentId(cached.getId());
                 deposit.setPaymentUrl(cached.getPaymentUrl());
                 deposit.setIdempotencyKey(idempotency);
-                deposit = depositRepository.save(deposit);
+                depositRepository.save(deposit);
             } else {
                 idempotencyService.createProcessing(idempotency, buildRequestHash(chargeReq));
                 CreateChargeResponse chargeResp = modemPayClient.createCharge(chargeReq);
@@ -127,15 +182,12 @@ public class DepositService {
                     deposit.setExternalPaymentId(chargeResp.getId());
                     deposit.setPaymentUrl(chargeResp.getPaymentUrl());
                     deposit.setIdempotencyKey(idempotency);
-                    deposit = depositRepository.save(deposit);
+                    depositRepository.save(deposit);
                 }
             }
         } catch (Exception ex) {
             log.warn("ModemPay charge creation failed for deposit {}: {}", deposit.getReference(), ex.getMessage());
         }
-
-        log.info("Deposit created: {} for user {} (agent={})", deposit.getReference(), targetUser.getId(), isAgent);
-        return deposit;
     }
 
     private String generateReference() {

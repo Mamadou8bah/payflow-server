@@ -12,9 +12,11 @@ import com.mamadou.payflow.auth.service.APIKeyService;
 import com.mamadou.payflow.auth.service.AuthService;
 import com.mamadou.payflow.common.response.ApiResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,6 +54,11 @@ public class AuthController {
     @PostMapping("/logout")
     public ApiResponse<String> logout(@Valid @RequestBody LogoutRequest request) {
         return new ApiResponse<>(true, authService.logout(request), null);
+    }
+
+    @GetMapping("/api-keys")
+    public ApiResponse<List<ApiKeyResponse>> listApiKeys() {
+        return new ApiResponse<>(true, "API keys", apiKeyService.listApiKeys());
     }
 
     @PostMapping("/api-keys")

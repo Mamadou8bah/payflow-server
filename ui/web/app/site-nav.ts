@@ -5,43 +5,27 @@ export type SiteNavGroup = {
 
 export const headerNavGroups: SiteNavGroup[] = [
   {
-    label: "Customers",
-    links: [
-      { label: "Wallet app", href: "/app" },
-      { label: "Checkout experience", href: "/#audiences" },
-      { label: "Transaction history", href: "/customers/transactions" },
-    ],
-  },
-  {
-    label: "Merchants",
-    links: [
-      { label: "Payment links", href: "/signup" },
-      { label: "Collections", href: "/#audiences" },
-      { label: "Webhook updates", href: "/merchants/webhooks" },
-    ],
-  },
-  {
     label: "Developers",
     links: [
       { label: "Developer docs", href: "/docs" },
-      { label: "API reference", href: "/docs#api" },
       { label: "Integration guide", href: "/developers/integration" },
+      { label: "API reference", href: "/docs#api" },
     ],
   },
   {
     label: "Operations",
     links: [
-      { label: "Risk controls", href: "/company/security" },
-      { label: "Reconciliation", href: "/operations/reconciliation" },
       { label: "Admin dashboard", href: "/dashboard" },
+      { label: "Reconciliation", href: "/operations/reconciliation" },
+      { label: "Security", href: "/company/security" },
     ],
   },
   {
     label: "Resources",
     links: [
-      { label: "Why choose us", href: "/#capabilities" },
       { label: "Help center", href: "/help" },
-      { label: "Contact sales", href: "/contact" },
+      { label: "Contact", href: "/contact" },
+      { label: "Status", href: "/status" },
     ],
   },
 ];
